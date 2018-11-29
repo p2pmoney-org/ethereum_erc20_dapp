@@ -1,0 +1,48 @@
+
+
+ <form name="erc20tokencreateForm" ng-controller="ERC20TokenCreateFormCtrl" ng-submit="handleSubmit()">
+ 
+  	<div>
+	
+	<span>
+		<label for="name">{{'Name:' | transl}}</label>
+		<input type="text" name="name" ng-model="name.text" required>
+		
+ 	</span>
+ 	
+	<span>
+		<label for="symbol">{{'Symbol:' | transl}}</label>
+		<input type="text" name="symbol" ng-model="symbol.text" required>
+		
+ 	</span>
+ 	
+	<span>
+		<label for="decimals">{{'Decimals:' | transl}}</label>
+		<input type="text" name="decimals" ng-model="decimals.text">
+		
+ 	</span>
+ 	
+	<span>
+		<label for="totalsupply">{{'Total supply:' | transl}}</label>
+		<input type="text" name="totalsupply" ng-model="totalsupply.text" required>
+		
+ 	</span>
+ 	
+	<span>
+		<label for="description">{{'Description:' | transl}}</label>
+		<input type="text" name="description" ng-model="description.text">
+		
+ 	</span>
+ 	
+  	<span class="form-actions">
+            <button type="submit" >{{'Create' || transl}}</button>
+	</span>
+ 
+    </div>
+ 
+ 	<div>
+	
+ 	</div>
+    
+ </form>
+

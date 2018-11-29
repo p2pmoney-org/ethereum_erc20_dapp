@@ -1,0 +1,55 @@
+
+
+<form name="erc20tokenaccountburnForm" ng-controller="ERC20TokenAccountBurnFormCtrl" ng-submit="handleSubmit()">
+ 
+ 	<input type="hidden" name="index" ng-model="erc20token.index" required>
+  	
+  	<div>
+	
+	<span id="from-span" class="from-span">
+		<label for="from">{{'From:' | transl}}</label>
+		<input type="text" name="from" ng-model="from.text" required>
+ 	</span>
+	
+  	<span id="tokenamount-span" class="tokenamount-span">
+		<label for="tokenamount">{{'Token Amount:' | transl}}</label>
+		<input type="text" name="from" ng-model="tokenamount.text" required>
+ 	</span>
+	
+ 	</div>
+ 
+ 	<div>
+	
+	<span id="walletused-span" class="walletused-span">
+		<label for="walletused">{{'Wallet used:' | transl}}</label>
+		<input type="text" name="walletused" ng-model="walletused.text" required>
+ 	</span>
+	
+ 	</div>
+ 	<div>
+
+	<span id="password-span" class="password-span">
+		<label for="password">{{'Password:' | transl}}</label>
+		<input type="password" name="password" ng-model="password.text">
+ 	</span>
+ 	
+	<span id="gaslimit-span" class="gaslimit-span">
+		<label for="gaslimit">{{'Gas limit:' | transl}}</label>
+		<input type="text" name="gaslimit" ng-model="gaslimit.text" required>
+	</span>
+	
+	<span id="gasprice-span" class="gasprice-span">
+		<label for="gasprice">{{'Gas price:' | transl}}</label>
+		<input type="text" name="gasprice" ng-model="gasprice.text" required>
+	</span>
+	
+  	<span class="form-actions">
+            <button type="submit" >{{'Burn' || transl}}</button>
+	</span>
+ 
+    </div>
+    
+    <div role="alert">
+    </div>
+</form>
+

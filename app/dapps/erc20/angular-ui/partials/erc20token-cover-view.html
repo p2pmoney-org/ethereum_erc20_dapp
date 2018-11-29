@@ -1,0 +1,55 @@
+<div id="ERC20TokenView" ng-controller="ERC20TokenViewCtrl">
+    
+    <table class="table-contract">
+    
+		<!-- local part -->
+		<tr class='tr-local'>
+	    	<td class='td-label'>{{'uuid' | transl}}</td>
+	    	<td>{{erc20tokenuuid.text}}</td>
+		</tr>
+	    	
+  		<tr class='tr-local'>
+	    	<td class='td-label'>{{'token name' | transl}}</td>
+	    	<td>{{localname.text}}</td>
+		</tr>
+	    	
+		<tr class='tr-local'>
+	    	<td class='td-label'>{{'description' | transl}}</td>
+	    	<td>{{localdescription.text}}</td>
+		</tr>
+	    	
+ 		<tr class='tr-local'>
+	    	<td class='td-label'>{{'contract address' | transl}}</td>
+	    	<td>{{address.text}}</td>
+		</tr>
+	    	
+ 		<tr class='tr-local'>
+	    	<td class='td-label'>{{'token symbol' | transl}}</td>
+	    	<td>{{localsymbol.text}}</td>
+		</tr>
+	    	
+  		<tr class='tr-local'>
+	    	<td class='td-label'>{{'status' | transl}}</td>
+	    	<td>{{status.text}}</td>
+		</tr>
+	    	
+ 		<!-- chain part -->
+  		<tr class='tr-chain'>
+	    	<td class='td-label'>{{'token name' | transl}}</td>
+	    	<td>{{chainname.text}}</td>
+		</tr>
+	    	
+  		<tr class='tr-chain'>
+	    	<td class='td-label'>{{'token symbol' | transl}}</td>
+	    	<td>{{chainsymbol.text}}</td>
+		</tr>
+	    	
+   		<tr class='tr-chain'>
+	    	<td class='td-label'>{{'status' | transl}}</td>
+	    	<td>{{livestatus.text}}</td>
+		</tr>
+	    	
+    
+    </table>
+
+</div>

@@ -1,0 +1,18 @@
+
+<div id="ERC20TokenAccountPositionsViewCtrl" ng-controller="ERC20TokenAccountPositionsViewCtrl">
+    
+    <table class="table-contract-list">
+    
+		<tr>
+	    	<td>{{'Address' | transl}}</td>
+	    	<td>{{'Position' | transl}}</td>
+    	</tr>
+        
+        <tr ng-repeat="accountposition in accountpositions" class="{{$odd ? 'table-contract-list-tr-local-odd' : 'table-contract-list-tr-local-even'}}">
+			<td><a ui-sref="home.erc20tokens.view.account({index: accountposition.erc20tokenindex, address: accountposition.address})">{{accountposition.address}}</a></td>
+	        <td>{{accountposition.balance}}</td>
+        </tr>
+
+    </table>
+
+</div>

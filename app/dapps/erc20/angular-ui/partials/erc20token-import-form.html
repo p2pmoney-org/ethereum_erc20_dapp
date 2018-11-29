@@ -1,0 +1,27 @@
+
+ <form name="erc20tokenimportForm" ng-controller="ERC20TokenImportFormCtrl" ng-submit="handleSubmit()">
+ 
+ 	<div>
+	
+ 	<span>
+	    <label for="addresstext">{{'Contract address:' | transl}}</label>
+		<input type="text" name="address" ng-model="address.text" required>
+ 	</span>
+    
+	<span>
+		<label for="descriptiontext">{{'Description:' | transl}}</label>
+		<input type="text" name="description" ng-model="description.text">
+ 	</span>
+	
+ 	
+  	<span class="form-actions">
+		<button type="submit" >{{'Import' || transl}}</button>
+	</span>
+ 
+    </div>
+    
+    <div role="alert">
+    </div>
+
+
+ </form>
