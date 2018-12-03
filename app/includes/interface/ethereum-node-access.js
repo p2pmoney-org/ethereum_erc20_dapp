@@ -533,6 +533,8 @@ class EthereumTransaction {
 	}
 	
 	getTxJson() {
+		var web3 = this.web3;
+		
 		var fromaccount = this.sendingaccount;
 		var toaccount = this.recipientaccount;
 		
@@ -559,7 +561,7 @@ class EthereumTransaction {
 			txjson.data = txdata;
 
 		// amount conversion to Wei
-		if (self.web3_version == "1.0.x") {
+		if (this.web3_version == "1.0.x") {
 			// Web3 > 1.0
 			if (amount)
 				txjson.value = web3.utils.toWei(amount, 'ether');
