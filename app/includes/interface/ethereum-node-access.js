@@ -593,11 +593,14 @@ class EthereumTransaction {
 		var toaddress = (toaccount ? toaccount.getAddress() : null);
 		
 		var txjson = this.getTxJson();
+		
+		var ethereumnodeaccessmodule = this.ethereumnodeaccessmodule;
+		var EthereumNodeAccess = session.getEthereumNodeAccessInstance();
 
 		
 		if (fromaccount.canSignTransactions()) {
 			// signing the transaction
-			var ethereumjs = this.ethereumnodeaccessmodule.getEthereumJsClass(session);
+			var ethereumjs = ethereumnodeaccessmodule.getEthereumJsClass(session);
 			
 			var hexprivkey = fromaccount.getPrivateKey();
 			
@@ -630,7 +633,8 @@ class EthereumTransaction {
 			var tx = new ethereumjs.Tx(txjson);
 			
 		    
-		    return web3.eth.getTransactionCount(fromaddress, function (err, count) {
+		    //return web3.eth.getTransactionCount(fromaddress, function (err, count) {
+		    return EthereumNodeAccess.web3_getTransactionCount(fromaddress, function (err, count) {
 		    	
 		    	if (!err) {
 			    	txjson.nonce = (nonce ? nonce : count);
@@ -1146,6 +1150,41 @@ class EthereumNodeAccess {
 		return promise;
 	}
 
+	web3_getTransactionCount(fromaddress, callback) {
+		var self = this
+		var session = this.session;
+
+		var promise = new Promise(function (resolve, reject) {
+			try {
+				var web3 = self._getWeb3Instance();
+				
+				return web3.eth.getTransactionCount(fromaddress, function(err, res) {
+					if (!err) {
+						if (callback)
+							callback(null, res);
+						return resolve(res);
+					}
+					else {
+						if (callback)
+							callback('web3 error: ' + err, null);
+						
+						reject('web3 error: ' + err);
+					}
+				
+				});
+			}
+			catch(e) {
+				if (callback)
+					callback('exception: ' + e, null);
+				
+				reject('web3 exception: ' + e);
+			}
+			
+		});
+		
+		return promise;
+	}
+	
 	web3_getTransaction(hash, callback) {
 		var self = this
 		var session = this.session;

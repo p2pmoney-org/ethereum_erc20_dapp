@@ -80,6 +80,7 @@ var RestConnection = class {
 	    
 	    xhttp.onload = function(e) {
 		    if (xhttp.status == 200) {
+			    //console.log('response text is ' + xhttp.responseText);
 		    	if (callback) {
 			    	var jsonresponse = JSON.parse(xhttp.responseText);
 			    		    		
