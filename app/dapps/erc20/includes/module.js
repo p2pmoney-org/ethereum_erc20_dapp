@@ -107,7 +107,7 @@ var Module = class {
 	//
 	
 	// erc20 tokens
-	_filterContracts(contracts) {
+	_filterLocalContracts(contracts) {
 		var array = [];
 		
 		if (!contracts)
@@ -125,7 +125,25 @@ var Module = class {
 		return array;
 	}
 	
-	getLocalERC20Tokens(session, bForceRefresh, callback) {
+	_filterContracts(contracts) {
+		var array = [];
+		
+		if (!contracts)
+			return array;
+		
+		var contractarray = contracts.getContractObjectsArray();
+
+		for (var i = 0; i < contractarray.length; i++) {
+			var contract = contractarray[i];
+			
+			if (contract.getContractType() == 'TokenERC20')
+			array.push(contract);
+		}
+
+		return array;
+	}
+	
+	getERC20Tokens(session, bForceRefresh, callback) {
 		var global = this.global;
 		var self = this;
 		
@@ -140,6 +158,25 @@ var Module = class {
 		});
 		
 		var array = this._filterContracts(contracts);
+		
+		return array;
+	}
+	
+	getLocalERC20Tokens(session, bForceRefresh, callback) {
+		var global = this.global;
+		var self = this;
+		
+		var commonmodule = global.getModuleObject('common');
+		
+		var contracts = commonmodule.getContractsObject(bForceRefresh, function(err, contracts) {
+			if (callback) {
+				var array = self._filterLocalContracts(contracts);
+				
+				callback(null, array);
+			}
+		});
+		
+		var array = this._filterLocalContracts(contracts);
 		
 		return array;
 	}

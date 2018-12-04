@@ -362,11 +362,33 @@ var DAPPControllers = class {
 		var views = this.erc20tokenviews;
 
 		// local contracts
-		// (this first call requires bForceRefresh of list to initiate a re-read)
+		// (in memory)
 		var localerc20tokens = [];
 		
 		var erc20tokenmodule = global.getModuleObject('erc20');
-		var localerc20tokenarray = erc20tokenmodule.getLocalERC20Tokens(session, true, function(err, res) {
+		var localerc20tokenarray = erc20tokenmodule.getLocalERC20Tokens(session, false);
+		
+		if (localerc20tokenarray) {
+			localerc20tokens = this._getViewERC20TokensArray($scope, views, localerc20tokenarray);
+		}
+		
+		$scope.localerc20tokens = localerc20tokens;
+		
+
+		// chain contracts
+		// (in memory)
+		var chainerc20tokens = [];
+		
+		var chainerc20tokenarray = erc20tokenmodule.getChainERC20Tokens(session, false);
+		
+		if (chainerc20tokenarray) {
+			chainerc20tokens = this._getViewERC20TokensArray($scope, views, chainerc20tokenarray)
+		}
+		
+		$scope.chainerc20tokens = chainerc20tokens;
+		
+		// refresh list to update both parts
+		erc20tokenmodule.getERC20Tokens(session, true, function(err, res) {
 			
 			// list of contracts has been refreshed
 			
@@ -381,24 +403,6 @@ var DAPPControllers = class {
 			    $scope.$apply();
 			  }, 100);
 		});
-		
-		if (localerc20tokenarray) {
-			localerc20tokens = this._getViewERC20TokensArray($scope, views, localerc20tokenarray);
-		}
-		
-		$scope.localerc20tokens = localerc20tokens;
-		
-
-		// chain contracts
-		var chainerc20tokens = [];
-		
-		var chainerc20tokenarray = erc20tokenmodule.getChainERC20Tokens(session, false);
-		
-		if (chainerc20tokenarray) {
-			chainerc20tokens = this._getViewERC20TokensArray($scope, views, chainerc20tokenarray)
-		}
-		
-		$scope.chainerc20tokens = chainerc20tokens;
 	}
 	
 	prepareERC20TokenView($scope, $state, $stateParams) {

@@ -68,6 +68,44 @@ var Module = class {
 	registerHooks() {
 		console.log('module registerHooks called for ' + this.name);
 		
+		var global = this.global;
+		
+		global.registerHook('getContractsObject_hook', 'common', this.getContractsObject_hook);
+	}
+	
+	getContractsObject_hook(result, params) {
+		console.log('getContractsObject_hook called for ' + this.name);
+		
+		var global = this.global;
+		var self = this;
+		
+		var session = params[0];
+		
+		var nextget = result.get;
+		result.get = function(err, jsonarray) {
+			var keys = ['common','contracts'];
+			
+			var localstorageobject = session.getLocalStorageObject();
+			
+			localstorageobject.readLocalJson(keys, true, function(err, myjsonarray) {
+				var newjsonarray = (myjsonarray && (myjsonarray.length > 0) ? jsonarray.concat(myjsonarray) : jsonarray);
+				
+				if (!err) {
+					if (nextget)
+						nextget(null, newjsonarray);
+				}
+				else {
+					if (nextget)
+						nextget(err, null);
+				}
+			});
+			
+			
+		}; // chaining of get function
+
+		result.push({module: 'common', handled: true});
+		
+		return true;
 	}
 	
 	//
@@ -145,51 +183,6 @@ var Module = class {
 		localstorage.saveLocalJson(_keys, json);
 	}
 	
-	/*_hasItemChildren(itemjson) {
-		return (typeof itemjson === 'object')
-	}
-	
-	_hasItemUUID(itemjson, uuid) {
-		return (itemjson && itemjson['uuid'] && (itemjson['uuid'] == uuid));
-	}
-	
-	_findJsonLeaf(parentjson, uuid) {
-		if (!parentjson)
-			return;
-		
-		var self = this;
-		
-		var jsonkeys = Object.keys(parentjson);
-		
-		if (!jsonkeys)
-			return;
-		
-		for (var i=0; i < jsonkeys.length; i++) {
-			var key = jsonkeys[i];
-			var itemjson = parentjson[key];
-			//console.log('scanning key ' + key);
-			//console.log('key value is ' + JSON.stringify(itemjson));
-			
-			if (this._hasItemUUID(itemjson, uuid))
-				return itemjson;
-			else {
-				// to avoid scanning strings
-				if (this._hasItemChildren(itemjson)) {
-					//console.log('deep diving in key ' + key);
-					var jsonleaf = self._findJsonLeaf(itemjson, uuid);
-					
-					if (jsonleaf)
-						return jsonleaf;
-				}
-				else {
-					//console.log('itemjson is ' + JSON.stringify(itemjson));
-				}
-			}
-			
-		};
-		
-	}*/
-	
 	getLocalJsonLeaf(session, keys, uuid) {
 		var commonkeys = ['common'];
 		
@@ -197,36 +190,7 @@ var Module = class {
 		
 		var localstorage = this.session.getLocalStorageObject();
 		return localstorage.getLocalJsonLeaf(_keys, uuid);
-		
-		/*var localjson = this.readLocalJson(session, keys);
-		
-		console.log('searching in keys ' + JSON.stringify(keys) + ' uuid ' + uuid);
-		
-		return this._findJsonLeaf(localjson, uuid);*/
 	}
-	
-	/*_replaceJsonLeaves(parentjson, uuid, childjson) {
-		if (!parentjson)
-			return;
-
-		var self = this;
-		
-		Object.keys(parentjson).forEach(function(key) {
-			
-			if (self._hasItemUUID(parentjson[key], uuid)) {
-				//console.log('replacing for key ' + key + ' json ' + JSON.stringify(parentjson[key]));
-				//console.log('by json ' + JSON.stringify(childjson));
-				
-				delete parentjson[key];
-				parentjson[key] = childjson;
-			}
-			else {
-				if (self._hasItemChildren(parentjson[key])) {
-					self._replaceJsonLeaves(parentjson[key], uuid, childjson);
-				}
-			}
-		});
-	}*/
 	
 	updateLocalJsonLeaf(session, keys, uuid, json) {
 		var commonkeys = ['common'];
@@ -235,14 +199,6 @@ var Module = class {
 
 		var localstorage = this.session.getLocalStorageObject();
 		return localstorage.updateLocalJsonLeaf(_keys, uuid, json);
-		
-		/*console.log('update json leaf with uuid ' + uuid);
-
-		var localjson = this.readLocalJson(session, keys);
-		
-		this._replaceJsonLeaves(localjson, uuid, json);
-		
-		this.saveLocalJson(session, keys, localjson);*/
 	}
 	
 	insertLocalJsonLeaf(session, keys, parentuuid, collectionname, json) {
@@ -252,29 +208,6 @@ var Module = class {
 
 		var localstorage = this.session.getLocalStorageObject();
 		return localstorage.insertLocalJsonLeaf(_keys, parentuuid, collectionname, json);
-		
-		/*console.log('insert json leaf under uuid ' + parentuuid + ' with uuid ' + json['uuid'] + ' for collection ' + collectionname);
-
-		var localjson = this.readLocalJson(session, keys);
-		
-		if (!localjson)
-			localjson = [];
-		
-		var parentjson = (parentuuid ? this._findJsonLeaf(localjson, parentuuid) : localjson);
-		var collectionjsonarray = (collectionname ? parentjson[collectionname] : parentjson);
-		
-		if (!collectionjsonarray) {
-			collectionjsonarray = [];
-			
-			if (collectionname)
-				parentjson[collectionname] = collectionjsonarray;
-			else
-				parentjson = collectionjsonarray;
-		}
-		
-		collectionjsonarray.push(json);
-		
-		this.saveLocalJson(session, keys, localjson);*/
 	}
 	
 	// session

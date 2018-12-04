@@ -367,7 +367,34 @@ class Controllers {
 		
 		var cryptokeys = [];
 		
-		var cryptokeyarray = session.getSessionCryptoKeyObjects();
+		var cryptokeyarray = session.getSessionCryptoKeyObjects(true, function(err, keyarray) {
+			if (keyarray) {
+				// empty array
+				while(cryptokeys.length > 0) { cryptokeys.pop();}
+				
+				for (var i = 0; i < keyarray.length; i++) {
+					var cryptokeyobj = keyarray[i];
+					
+					if (cryptokeyobj) {
+						var cryptokey = [];
+						
+						cryptokey['uuid'] = cryptokeyobj.getKeyUUID();
+
+						cryptokey['description'] = cryptokeyobj.getDescription();
+						cryptokey['address'] = cryptokeyobj.getAddress();
+						cryptokey['public_key'] = cryptokeyobj.getPublicKey();
+						
+						cryptokeys.push(cryptokey);
+					}
+				}
+			}
+			
+			// putting $apply in a deferred call to avoid determining if callback is called
+			// from a promise or direct continuation of the code
+			setTimeout(function() {
+			    $scope.$apply();
+			  }, 100);
+		});
 		
 		if (cryptokeyarray) {
 			for (var i = 0; i < cryptokeyarray.length; i++) {
@@ -401,7 +428,37 @@ class Controllers {
 		var ethaccounts = [];
 		
 		// get list of all accounts (third party and personal)
-		var accountarray = session.getAccountObjects();
+		var accountarray = session.getAccountObjects(true, function(err, accntarray) {
+			// empty array
+			while(ethaccounts.length > 0) { ethaccounts.pop();}
+
+			if (accntarray) {
+				for (var i = 0; i < accntarray.length; i++) {
+					var account = accntarray[i];
+					
+					if (account) {
+						var ethaccount = [];
+						
+						ethaccount['uuid'] = account.getAccountUUID();
+
+						ethaccount['description'] = (account.getDescription() !== null ? account.getDescription() : account.getAddress());
+						ethaccount['yours'] = (account.getPrivateKey() !== null ? global.t('yes') : global.t('no'));
+						ethaccount['address'] = account.getAddress();
+						ethaccount['public_key'] = account.getPublicKey();
+						ethaccount['rsa_public_key'] = account.getRsaPublicKey();
+						
+						ethaccounts.push(ethaccount);
+					}
+				}
+			}
+			
+			
+			// putting $apply in a deferred call to avoid determining if callback is called
+			// from a promise or direct continuation of the code
+			setTimeout(function() {
+			    $scope.$apply();
+			  }, 100);
+		});
 		
 		if (accountarray) {
 			for (var i = 0; i < accountarray.length; i++) {

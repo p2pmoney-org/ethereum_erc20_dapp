@@ -195,7 +195,60 @@ var Session = class {
 		return new Session.CryptoKey(this, null);
 	}
 	
-	getSessionCryptoKeyObjects() {
+	getSessionCryptoKeyObjects(bForceRefresh, callback) {
+		var cryptokeys = this.cryptokeymap.getCryptoKeyArray();
+		
+		if ((!bForceRefresh) && (bForceRefresh != true)) {
+			
+			if (callback)
+				callback(null, cryptokeys);
+			
+			return cryptokeys;
+		}
+		
+		var global = this.getGlobalObject();
+		var self = this;
+		
+		// invoke hook to build processing chain
+		var result = [];
+		
+		var params = [];
+		
+		params.push(this);
+		
+		result.get = function(err, keyarray) {
+
+			if (!err) {
+				self.cryptokeymap.empty();
+				
+				for (var i = 0; i < keyarray.length; i++) {
+					var key = keyarray[i];
+					
+					self.cryptokeymap.pushCryptoKey(key);
+				}
+				
+				if (callback)
+					callback(null, self.cryptokeymap.getCryptoKeyArray());
+			}
+			else {
+				if (callback)
+					callback(err, self.cryptokeymap.getCryptoKeyArray());
+			}
+		};
+
+		var ret = global.invokeHooks('getSessionCryptoKeyObjects_hook', result, params);
+		
+		if (ret && result && result.length) {
+			global.log('getSessionCryptoKeyObjects_hook result is ' + JSON.stringify(result));
+		}
+		
+		
+		// process after hooks chained the get functions
+		var keyarray = [];
+		
+		result.get(null, keyarray);
+
+		
 		return this.cryptokeymap.getCryptoKeyArray();
 	}
 	
@@ -266,7 +319,58 @@ var Session = class {
 		return new Session.Account(this, null);
 	}
 	
-	getAccountObjects() {
+	getAccountObjects(bForceRefresh, callback) {
+		var accounts = this.accountmap.getAccountArray();
+		
+		if ((!bForceRefresh) && (bForceRefresh != true)) {
+			
+			if (callback)
+				callback(null, accounts);
+			
+			return accounts;
+		}
+		
+		var global = this.getGlobalObject();
+		var self = this;
+		
+		// invoke hook to build processing chain
+		var result = [];
+		
+		var params = [];
+		
+		params.push(this);
+		
+		result.get = function(err, accountarray) {
+			if (!err) {
+				self.accountmap.empty();
+				
+				for (var i = 0; i < accountarray.length; i++) {
+					var account = accountarray[i];
+					
+					self.accountmap.pushAccount(account);
+				}
+				
+				if (callback)
+					callback(null, self.accountmap.getAccountArray());
+			}
+			else {
+				if (callback)
+					callback(err, self.accountmap.getAccountArray());
+			}
+		};
+
+		var ret = global.invokeHooks('getAccountObjects_hook', result, params);
+		
+		if (ret && result && result.length) {
+			global.log('getAccountObjects_hook result is ' + JSON.stringify(result));
+		}
+		
+		
+		// process after hooks chained the get functions
+		var accountarray = [];
+		
+		result.get(null, accountarray);
+		
 		return this.accountmap.getAccountArray();
 	}
 	
@@ -422,7 +526,47 @@ var Session = class {
 		}
 	}
 	
-	getSessionAccountObjects() {
+	getSessionAccountObjects(bForceRefresh, callback) {
+		var accounts;
+		
+		if ((!bForceRefresh) && (bForceRefresh != true)) {
+			
+			if (this.user != null)
+				accounts = this.user.getAccountObjects();
+			else
+				accounts = null;
+			
+			if (callback)
+				callback(null, accounts);
+			
+			return accounts;
+		}
+		
+		// we refresh the list of all accounts
+		var self = this;
+		
+		this.getAccountObjects(bForceRefresh, function(err, ress) {
+			var accnts;
+			if (!err) {
+				
+				if (self.user != null)
+					accnts = self.user.getAccountObjects();
+				else
+					accnts = null;
+				
+				if (callback)
+					callback(null, accnts);
+				
+				return accnts;
+			}
+			else {
+				if (callback)
+					callback(err, accnts);
+				
+				return accnts;
+			}
+		});
+		
 		if (this.user != null)
 			return this.user.getAccountObjects();
 		else
@@ -434,6 +578,8 @@ var Session = class {
 		var global = this.getGlobalObject();
 		var commonmodule = global.getModuleObject('common');
 		var user = session.getSessionUserObject();
+		
+		var accountarray = [];
 		
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
@@ -457,8 +603,11 @@ var Session = class {
 				//user.addAccountObject(account);
 				account.setOwner(user);
 				session.addAccountObject(account);
+				
+				accountarray.push(account);
 			}
 			else {
+				// simple account, not a session account
 				var account = commonmodule.createBlankAccountObject();
 				
 				try {
@@ -469,13 +618,17 @@ var Session = class {
 					account.setDescription(description);
 					
 					session.addAccountObject(account);
+					
+					accountarray.push(account);
 				}
 				catch(e) {
 					console.log('exception while adding external accounts: ' + e);
 				}
 			}
 		
-		}		
+		}
+		
+		return accountarray;
 	}
 	
 	getSessionAccountAddresses() {
@@ -558,7 +711,7 @@ var Session = class {
 		if ((this.contracts) && (!bForceRefresh) && (bForceRefresh != true)) {
 			
 			if (callback)
-				callback(null, this.contracts)
+				callback(null, this.contracts);
 			
 			return this.contracts;
 		}
@@ -574,45 +727,38 @@ var Session = class {
 		var global = this.getGlobalObject();
 		var self = this;
 		
-		var keys = ['common','contracts'];
+		// invoke hook to build processing chain
+		var result = [];
 		
-		var localstorageobject = this.getLocalStorageObject();
+		var params = [];
 		
-		localstorageobject.readLocalJson(keys, true, function(err, jsonarray) {
-			
+		params.push(this);
+		
+		result.get = function(err, jsonarray) {
 			if (!err) {
 				self.contracts.initContractObjects(jsonarray);
 				
 				if (callback)
-					callback(null, self.contracts)
+					callback(null, self.contracts);
 			}
-		});
-		
-		return this.contracts;
-		
+			else {
+				if (callback)
+					callback(err, self.contracts);
+			}
+		};
 
-//		var storageaccess = this.getStorageAccessInstance();
-//		
-//		if (this.isAnonymous()) {
-//			var jsonarray = storageaccess.readLocalJson(keys);
-//			
-//			this.contracts.initContractObjects(jsonarray);
-//			
-//			if (callback)
-//				callback(null, this.contracts)
-//		}
-//		else {
-//			storageaccess.readUserJson(keys, function(err, jsonarray) {
-//				self.contracts.initContractObjects(jsonarray);
-//				
-//				if (callback)
-//					callback(null, self.contracts)
-//			});
-//		}
-
-		//var commonmodule = global.getModuleObject('common');
-		//var jsonarray = commonmodule.readLocalJson(this, keys);
+		var ret = global.invokeHooks('getContractsObject_hook', result, params);
 		
+		if (ret && result && result.length) {
+			global.log('getContractsObject_hook result is ' + JSON.stringify(result));
+		}
+		
+		
+		// process after hooks chained the get functions
+		var jsonarray = [];
+		
+		result.get(null, jsonarray);
+
 		
 		return this.contracts;
 	}
@@ -626,22 +772,9 @@ var Session = class {
 		
 		var keys = ['common','contracts'];
 
-		//var storageaccess = this.getStorageAccessInstance();
 		var localstorageobject = this.getLocalStorageObject();
 		
 		localstorageobject.saveLocalJson(keys, json);;
-		
-		/*if (this.isAnonymous()) {
-			storageaccess.saveLocalJson(keys, json);
-		}
-		else {
-			storageaccess.saveUserJson(keys, json, function() {
-				global.log("user contracts saved");
-			});
-		}*/
-		
-		//var commonmodule = global.getModuleObject('common');
-		//commonmodule.saveLocalJson(this, keys, json);
 	}
 
 	ownsContract(contract) {
