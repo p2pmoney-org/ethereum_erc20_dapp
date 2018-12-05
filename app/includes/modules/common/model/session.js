@@ -763,9 +763,9 @@ var Session = class {
 		return this.contracts;
 	}
 	
-	saveContractObjects(contracts) {
+	saveContractObjects(contracts, callback) {
 		var json = contracts.getContractObjectsJson();
-		console.log("contracts json is " + JSON.stringify(json));
+		console.log("Session.saveContractObjects: contracts json is " + JSON.stringify(json));
 		
 		var global = this.getGlobalObject();
 		var self = this;
@@ -774,7 +774,20 @@ var Session = class {
 
 		var localstorageobject = this.getLocalStorageObject();
 		
-		localstorageobject.saveLocalJson(keys, json);;
+		localstorageobject.saveLocalJson(keys, json, function(err, jsonarray) {
+			if (!err) {
+				// re-initialize contract list (that can have been refreshed from previous states)
+				// with the saved version
+				if (self.contracts) {
+					self.contracts.initContractObjects(jsonarray);
+				}
+			}
+			
+			if (callback)
+				callback(null, self.contracts);
+			
+			return self.contracts;
+		});
 	}
 
 	ownsContract(contract) {

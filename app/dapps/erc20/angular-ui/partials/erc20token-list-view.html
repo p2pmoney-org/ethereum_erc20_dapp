@@ -15,24 +15,24 @@
         
 		<!-- local contracts --> 
         <tr ng-repeat="erc20token in localerc20tokens" class="{{$odd ? 'table-contract-list-tr-local-odd' : 'table-contract-list-tr-local-even'}}">
-			<td><a ui-sref="home.erc20tokens.modify({index: erc20token.index})">{{erc20token.name}}</a></td>
+			<td><a ui-sref="home.erc20tokens.modify({uuid: erc20token.uuid})">{{erc20token.name}}</a></td>
 	        <td>{{erc20token.symbol}}</td>
 	        <td>{{erc20token.totalsupply}}</td>
 	        <td>{{erc20token.decimals}}</td>
 	        <td>{{erc20token.statusstring}}</td>
 	        <td>{{erc20token.description}}</td>
-	        <td class="table-contract-list-action-td"><a ui-sref="home.erc20tokens.delete({index: erc20token.index})">{{'remove from list' | transl}}</a></td>
+	        <td class="table-contract-list-action-td"><a ui-sref="home.erc20tokens.delete({uuid: erc20token.uuid})">{{'remove from list' | transl}}</a></td>
         </tr>
     
 		<!-- chain contracts --> 
         <tr ng-repeat="erc20token in chainerc20tokens" class="{{$odd ? 'table-contract-list-tr-chain-odd' : 'table-contract-list-tr-chain-even'}}">
-			<td><a ui-sref="home.erc20tokens.view({index: erc20token.index})">{{erc20token.name}}</a></td>
+			<td><a ui-sref="home.erc20tokens.view({uuid: erc20token.uuid})">{{erc20token.name}}</a></td>
 			<td>{{erc20token.symbol}}</td>
 	        <td>{{erc20token.totalsupply}}</td>
 	        <td>{{erc20token.decimals}}</td>
 	        <td>{{erc20token.statusstring}}</td>
 	        <td>{{erc20token.description}}</td>
-	        <td class="table-contract-list-action-td"><a ui-sref="home.erc20tokens.delete({index: erc20token.index})">{{'remove from list' | transl}}</a></td>
+	        <td class="table-contract-list-action-td"><a ui-sref="home.erc20tokens.delete({uuid: erc20token.uuid})">{{'remove from list' | transl}}</a></td>
         </tr>
 
     </table>

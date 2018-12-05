@@ -160,7 +160,7 @@ var Module = class {
 		return this.global.globalscope.Config.needToUnlockAccounts();
 	}
 	
-	// client side persistence
+	// local persistence (as opposed to chain persistence)
 	readLocalJson(session, keys) {
 		var commonkeys = ['common'];
 		
@@ -183,31 +183,31 @@ var Module = class {
 		localstorage.saveLocalJson(_keys, json);
 	}
 	
-	getLocalJsonLeaf(session, keys, uuid) {
+	getLocalJsonLeaf(session, keys, uuid, uuidfieldname) {
 		var commonkeys = ['common'];
 		
 		var _keys = commonkeys.concat(keys);
 		
 		var localstorage = this.session.getLocalStorageObject();
-		return localstorage.getLocalJsonLeaf(_keys, uuid);
+		return localstorage.getLocalJsonLeaf(_keys, uuid, uuidfieldname);
 	}
 	
-	updateLocalJsonLeaf(session, keys, uuid, json) {
+	updateLocalJsonLeaf(session, keys, uuid, json, uuidfieldname) {
 		var commonkeys = ['common'];
 		
 		var _keys = commonkeys.concat(keys);
 
 		var localstorage = this.session.getLocalStorageObject();
-		return localstorage.updateLocalJsonLeaf(_keys, uuid, json);
+		return localstorage.updateLocalJsonLeaf(_keys, uuid, json, uuidfieldname);
 	}
 	
-	insertLocalJsonLeaf(session, keys, parentuuid, collectionname, json) {
+	insertLocalJsonLeaf(session, keys, parentuuid, collectionname, json, uuidfieldname) {
 		var commonkeys = ['common'];
 		
 		var _keys = commonkeys.concat(keys);
 
 		var localstorage = this.session.getLocalStorageObject();
-		return localstorage.insertLocalJsonLeaf(_keys, parentuuid, collectionname, json);
+		return localstorage.insertLocalJsonLeaf(_keys, parentuuid, collectionname, json, uuidfieldname);
 	}
 	
 	// session

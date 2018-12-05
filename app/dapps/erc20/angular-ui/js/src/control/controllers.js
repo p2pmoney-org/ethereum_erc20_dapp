@@ -125,11 +125,11 @@ var DAPPControllers = class {
 	        ncyBreadcrumb: { label: global.t('Create') }})
 	    .state('home.erc20tokens.import', {url: '/import', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-import.html', controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Import') }})
-	    .state('home.erc20tokens.modify', {url: '/modify/:index', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-modify.html', controller: "PageRequestHandler",}},
+	    .state('home.erc20tokens.modify', {url: '/modify/:uuid', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-modify.html', controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Modify') }})
-	    .state('home.erc20tokens.deploy', {url: '/deploy/:index', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-deploy.html', controller: "PageRequestHandler",}},
+	    .state('home.erc20tokens.deploy', {url: '/deploy/:uuid', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-deploy.html', controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Publish') }})
-	    .state('home.erc20tokens.view', {url: '/view/:index', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-view.html', controller: "PageRequestHandler",}},
+	    .state('home.erc20tokens.view', {url: '/view/:uuid', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-view.html', controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('View') }})
 	    .state('home.erc20tokens.view.account', {url: '/account/:address', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-account-view.html', controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Account') }})
@@ -141,7 +141,7 @@ var DAPPControllers = class {
 	        ncyBreadcrumb: { label: global.t('Approve') }})
 	    .state('home.erc20tokens.view.account.approveandcall', {url: '/approveandcall', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-account-approveandcall.html', controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Approve') }})
-	    .state('home.erc20tokens.delete', {url: '/delete/:index', views: {'main@': {controller: "ERC20TokenRemoveRequestHandler",}},
+	    .state('home.erc20tokens.delete', {url: '/delete/:uuid', views: {'main@': {controller: "ERC20TokenRemoveRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Delete') }})
 	}
 	
@@ -152,38 +152,40 @@ var DAPPControllers = class {
 	handleRemoveERC20TokenRequestFromList($scope, $state, $stateParams) {
 		console.log("Controllers.handleRemoveERC20TokenRequestFromList called");
 	    
+		var self = this;
 		var global = this.global;
 		var app = this.getAppObject();
 
-		var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 
 	    var global = this.global;
 	    
 		var commonmodule = global.getModuleObject('common');
 		var session = commonmodule.getSessionObject();
-		//var contracts = session.getContractsObject();
 	    
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 		if (erc20tokencontract) {
 			if (confirm('Are you sure you want to remove "' + erc20tokencontract.getLocalName() + '"?')) {
-				/*contracts.removeContractObject(erc20tokencontract);
-
-				session.saveContractObjects(contracts);*/
-				
 				erc20tokencontrollers.removeERC20TokenObject(erc20tokencontract);
 				
-				erc20tokencontrollers.saveERC20Tokens();
+				erc20tokencontrollers.saveERC20Tokens(function(err, res) {
+					self.getAngularControllers().gotoStatePage('home.erc20tokens');
+				});
+			}
+			else {
+				this.getAngularControllers().gotoStatePage('home.erc20tokens');
 			}
 		}
 		else {
-			alert(contractindex + 'not found');
+			alert(contractuuid + 'not found');
+			
+			this.getAngularControllers().gotoStatePage('home.erc20tokens');
 		}
 		
-		this.getAngularControllers().gotoStatePage('home.erc20tokens');
 	}
 		  
 	//
@@ -198,6 +200,7 @@ var DAPPControllers = class {
 		var erc20token = [];
 		
 		erc20token.index = contract.getContractIndex();
+		erc20token.uuid = contract.getUUID();
 
 		erc20token.isLocalOnly = contract.isLocalOnly();
 		
@@ -408,7 +411,7 @@ var DAPPControllers = class {
 	prepareERC20TokenView($scope, $state, $stateParams) {
 		console.log("Controllers.prepareERC20TokenView called");
 		
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 
 	    var global = this.global;
 		var erc20tokenmodule = global.getModuleObject('erc20');
@@ -416,10 +419,11 @@ var DAPPControllers = class {
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		var erc20tokenviews = this.erc20tokenviews;
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 		if (erc20tokencontract) {
 			$scope.erc20tokenindex = erc20tokencontract.getContractIndex();
+			$scope.erc20tokenuuid = erc20tokencontract.getUUID();
 			$scope.isLocalOnly = erc20tokencontract.isLocalOnly();
 			
 			
@@ -506,7 +510,7 @@ var DAPPControllers = class {
 	prepareERC20TokenAccountsPositionsView($scope, $state, $stateParams) {
 		console.log("Controllers.prepareERC20TokenView called");
 		
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 
 	    var global = this.global;
 	    
@@ -519,7 +523,7 @@ var DAPPControllers = class {
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 		var accountpositions = [];
 		
@@ -535,7 +539,8 @@ var DAPPControllers = class {
 						var accountposition = [];
 						var accountaddress = account.getAddress();
 						
-						accountposition['erc20tokenindex'] = contractindex;
+						accountposition['erc20tokenindex'] = erc20tokencontract.getContractIndex();
+						accountposition['erc20tokenuuid'] = erc20tokencontract.getUUID();
 						
 						accountposition['address'] = accountaddress;
 						accountposition['balance'] = global.t('loading');
@@ -612,9 +617,11 @@ var DAPPControllers = class {
 		var erc20token = erc20tokencontrollers.createERC20TokenObject(data);
 		
 		// save erc20token
-		erc20tokencontrollers.saveERC20TokenObject(erc20token);
+		var self = this;
+		erc20tokencontrollers.saveERC20TokenObject(erc20token, function(err, res) {
+			self.getAngularControllers().gotoStatePage('home.erc20tokens');
+		});
 		
-		this.getAngularControllers().gotoStatePage('home.erc20tokens');
 	}
 	
 	// notice import
@@ -645,6 +652,7 @@ var DAPPControllers = class {
 		data['address'] = $scope.address.text;
 		
 		// call module controller
+		var self = this;
 		var global = this.global;
 		var app = this.getAppObject();
 		var erc20tokenmodule = global.getModuleObject('erc20');
@@ -656,35 +664,40 @@ var DAPPControllers = class {
 		
 		if (contract) {
 			// save contract
-			erc20tokencontrollers.saveERC20TokenObject(contract);
-			
-			// start a promise chain, to collect name, symbol,..
-			console.log("starting retrieving chain data");
+			erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
+				// start a promise chain, to collect name, symbol,..
+				console.log("starting retrieving chain data");
 
-			var name;
-			var promise = contract.getChainName(function(err, res) {
-				name = res;
-				
-				console.log("chain name is " + res);
-				
-				return contract.getChainSymbol(function(err, res) {
-					return res;
-				}).then(function(symbol) {
+				var name;
+				var promise = contract.getChainName(function(err, res) {
+					name = res;
 					
-					contract.setLocalName(name);
-					contract.setLocalSymbol(symbol);
+					console.log("chain name is " + res);
 					
-					// save erc20token
-					erc20tokencontrollers.saveERC20TokenObject(contract);
-					
-					console.log("deployed contract completely retrieved");
+					return contract.getChainSymbol(function(err, res) {
+						return res;
+					}).then(function(symbol) {
+						
+						contract.setLocalName(name);
+						contract.setLocalSymbol(symbol);
+						
+						// save erc20token
+						erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
+							self.getAngularControllers().gotoStatePage('home.erc20tokens');
+						});
+						
+						console.log("deployed contract completely retrieved");
 
-					app.setMessage("deployed contract completely retrieved");
+						app.setMessage("deployed contract completely retrieved");
+					});
 				});
 			});
+			
+		}
+		else {
+			this.getAngularControllers().gotoStatePage('home.erc20tokens');
 		}
 		
-		this.getAngularControllers().gotoStatePage('home.erc20tokens');
 	}
 	
 	// erc20 token modification
@@ -693,7 +706,7 @@ var DAPPControllers = class {
 		
 		var self = this;
 
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 
 		// call module controller
 		var global = this.global;
@@ -701,7 +714,7 @@ var DAPPControllers = class {
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 
 		// filling fields
 		var erc20token = [];
@@ -710,6 +723,7 @@ var DAPPControllers = class {
 		
 		if (erc20tokencontract) {
 			erc20token.index = erc20tokencontract.getContractIndex();
+			erc20token.uuid = erc20tokencontract.getUUID();
 			
 			$scope.name = {
 					text: (erc20tokencontract ? erc20tokencontract.getLocalName() : global.t('no name'))
@@ -743,7 +757,7 @@ var DAPPControllers = class {
 	handleERC20TokenModifySubmit($scope) {
 		console.log("Controllers.handleERC20TokenModifySubmit called");
 	    
-		var contractindex = $scope.erc20token.index;
+		var contractuuid = $scope.erc20token.uuid;
 
 		var data = [];
 		
@@ -760,14 +774,17 @@ var DAPPControllers = class {
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
 		// get (local) erc20token 
-		var erc20token = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20token = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 		erc20token = erc20tokencontrollers.modifyERC20TokenObject(erc20token, data);
 		
 		// save erc20token
-		erc20tokencontrollers.saveERC20TokenObject(erc20token);
+		var self = this;
 		
-		this.getAngularControllers().gotoStatePage('home.erc20tokens');
+		erc20tokencontrollers.saveERC20TokenObject(erc20token, function(err,res) {
+			self.getAngularControllers().gotoStatePage('home.erc20tokens');
+		});
+		
 	}
 	
 	// erc20 token deployment
@@ -776,7 +793,7 @@ var DAPPControllers = class {
 		
 		var self = this;
 
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 
 		// call module controller
 		var global = this.global;
@@ -789,7 +806,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 
 		// filling fields
@@ -801,7 +818,7 @@ var DAPPControllers = class {
 
 		if (erc20tokencontract) {
 			erc20token.index = erc20tokencontract.getContractIndex();
-			
+			erc20token.uuid = erc20tokencontract.getUUID();
 		}
 		
 		// prepare wallet part
@@ -839,6 +856,7 @@ var DAPPControllers = class {
 	handleERC20TokenDeploySubmit($scope) {
 		console.log("Controllers.handleERC20TokenDeploySubmit called");
 		
+		var self = this;
 		var global = this.global;
 		var app = this.getAppObject();
 		
@@ -861,7 +879,7 @@ var DAPPControllers = class {
 			var gaslimit = $scope.gaslimit.text;
 			var gasPrice = $scope.gasprice.text;
 			
-			var contractindex = $scope.erc20token.index;
+			var contractuuid = $scope.erc20token.uuid;
 			
 			
 			var commonmodule = global.getModuleObject('common');
@@ -871,7 +889,7 @@ var DAPPControllers = class {
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 
 
-			var contract = contracts.getContractObjectFromKey(contractindex);
+			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if ((contract) && (contract.isLocalOnly())) {
 				var session = commonmodule.getSessionObject();
@@ -896,7 +914,9 @@ var DAPPControllers = class {
 							}
 								
 							// save erc20token
-							erc20tokencontrollers.saveERC20TokenObject(contract);
+							erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
+								self.getAngularControllers().gotoStatePage('home.erc20tokens');
+							});
 						});
 						
 						app.setMessage("contract deployment created a pending transaction");
@@ -923,7 +943,7 @@ var DAPPControllers = class {
 		
 		var self = this;
 
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 	    var accountaddress = $stateParams.address;
 
 		// call module controller
@@ -954,7 +974,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 
 		// filling fields
@@ -972,7 +992,7 @@ var DAPPControllers = class {
 		
 		if (erc20tokencontract) {
 			erc20token.index = erc20tokencontract.getContractIndex();
-			
+			erc20token.uuid = erc20tokencontract.getUUID();
 		}
 		
 		// prepare wallet part
@@ -1034,7 +1054,7 @@ var DAPPControllers = class {
 			var gaslimit = $scope.gaslimit.text;
 			var gasPrice = $scope.gasprice.text;
 			
-			var contractindex = $scope.erc20token.index;
+			var contractuuid = $scope.erc20token.uuid;
 			
 			
 			var commonmodule = global.getModuleObject('common');
@@ -1044,7 +1064,7 @@ var DAPPControllers = class {
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 
 
-			var contract = contracts.getContractObjectFromKey(contractindex);
+			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
 				var session = commonmodule.getSessionObject();
@@ -1097,7 +1117,7 @@ var DAPPControllers = class {
 		
 		var self = this;
 
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 	    var accountaddress = $stateParams.address;
 
 		// call module controller
@@ -1116,7 +1136,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 
 		// filling fields
@@ -1134,7 +1154,7 @@ var DAPPControllers = class {
 		
 		if (erc20tokencontract) {
 			erc20token.index = erc20tokencontract.getContractIndex();
-			
+			erc20token.uuid = erc20tokencontract.getUUID();
 		}
 		
 		// prepare wallet part
@@ -1195,7 +1215,7 @@ var DAPPControllers = class {
 			var gaslimit = $scope.gaslimit.text;
 			var gasPrice = $scope.gasprice.text;
 			
-			var contractindex = $scope.erc20token.index;
+			var contractuuid = $scope.erc20token.uuid;
 			
 			
 			var commonmodule = global.getModuleObject('common');
@@ -1205,7 +1225,7 @@ var DAPPControllers = class {
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 
 
-			var contract = contracts.getContractObjectFromKey(contractindex);
+			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
 				var session = commonmodule.getSessionObject();
@@ -1256,7 +1276,7 @@ var DAPPControllers = class {
 		
 		var self = this;
 
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 	    var accountaddress = $stateParams.address;
 
 		// call module controller
@@ -1275,7 +1295,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 
 		// filling fields
@@ -1293,7 +1313,7 @@ var DAPPControllers = class {
 		
 		if (erc20tokencontract) {
 			erc20token.index = erc20tokencontract.getContractIndex();
-			
+			erc20token.uuid = erc20tokencontract.getUUID();
 		}
 		
 		// prepare wallet part
@@ -1355,7 +1375,7 @@ var DAPPControllers = class {
 			var gaslimit = $scope.gaslimit.text;
 			var gasPrice = $scope.gasprice.text;
 			
-			var contractindex = $scope.erc20token.index;
+			var contractuuid = $scope.erc20token.uuid;
 			
 			
 			var commonmodule = global.getModuleObject('common');
@@ -1365,7 +1385,7 @@ var DAPPControllers = class {
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 
 
-			var contract = contracts.getContractObjectFromKey(contractindex);
+			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
 				var session = commonmodule.getSessionObject();
@@ -1414,7 +1434,7 @@ var DAPPControllers = class {
 		
 		var self = this;
 
-	    var contractindex = $stateParams.index;
+	    var contractuuid = $stateParams.uuid;
 	    var accountaddress = $stateParams.address;
 
 		// call module controller
@@ -1433,7 +1453,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromKey(contractindex);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 		
 
 		// filling fields
@@ -1451,7 +1471,7 @@ var DAPPControllers = class {
 		
 		if (erc20tokencontract) {
 			erc20token.index = erc20tokencontract.getContractIndex();
-			
+			erc20token.uuid = erc20tokencontract.getUUID();
 		}
 		
 		// prepare wallet part
@@ -1512,7 +1532,7 @@ var DAPPControllers = class {
 			var gaslimit = $scope.gaslimit.text;
 			var gasPrice = $scope.gasprice.text;
 			
-			var contractindex = $scope.erc20token.index;
+			var contractuuid = $scope.erc20token.uuid;
 			
 			
 			var commonmodule = global.getModuleObject('common');
@@ -1522,7 +1542,7 @@ var DAPPControllers = class {
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 
 
-			var contract = contracts.getContractObjectFromKey(contractindex);
+			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
 				var session = commonmodule.getSessionObject();

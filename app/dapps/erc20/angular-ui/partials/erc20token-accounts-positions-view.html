@@ -9,7 +9,7 @@
     	</tr>
         
         <tr ng-repeat="accountposition in accountpositions" class="{{$odd ? 'table-contract-list-tr-local-odd' : 'table-contract-list-tr-local-even'}}">
-			<td><a ui-sref="home.erc20tokens.view.account({index: accountposition.erc20tokenindex, address: accountposition.address})">{{accountposition.address}}</a></td>
+			<td><a ui-sref="home.erc20tokens.view.account({uuid: accountposition.erc20tokenuuid, address: accountposition.address})">{{accountposition.address}}</a></td>
 	        <td>{{accountposition.balance}}</td>
         </tr>
 

@@ -58,15 +58,17 @@ var LocalStorage = class {
 		return (typeof itemjson === 'object')
 	}
 	
-	_hasItemUUID(itemjson, uuid) {
-		return (itemjson && itemjson['uuid'] && (itemjson['uuid'] == uuid));
+	_hasItemUUID(itemjson, uuid, uuidfieldname) {
+		var fieldname = (uuidfieldname ? uuidfieldname : 'uuid');
+		return (itemjson && itemjson[fieldname] && (itemjson[fieldname] == uuid));
 	}
 	
-	_findJsonLeaf(parentjson, uuid) {
+	_findJsonLeaf(parentjson, uuid, uuidfieldname) {
 		if (!parentjson)
 			return;
 		
 		var self = this;
+		var fieldname = (uuidfieldname ? uuidfieldname : 'uuid');
 		
 		/*if (!this.loopcount) this.loopcount = 1;
 		
@@ -84,13 +86,13 @@ var LocalStorage = class {
 			//console.log('scanning key ' + key);
 			//console.log('key value is ' + JSON.stringify(itemjson));
 			
-			if (this._hasItemUUID(itemjson, uuid))
+			if (this._hasItemUUID(itemjson, uuid, fieldname))
 				return itemjson;
 			else {
 				// to avoid scanning strings
 				if (this._hasItemChildren(itemjson)) {
 					//console.log('deep diving in key ' + key);
-					var jsonleaf = self._findJsonLeaf(itemjson, uuid);
+					var jsonleaf = self._findJsonLeaf(itemjson, uuid, fieldname);
 					
 					if (jsonleaf)
 						return jsonleaf;
@@ -104,24 +106,27 @@ var LocalStorage = class {
 		
 	}
 	
-	getLocalJsonLeaf(keys, uuid) {
+	getLocalJsonLeaf(keys, uuid, uuidfieldname) {
 		var session = this.session;
+		var fieldname = (uuidfieldname ? uuidfieldname : 'uuid');
+
 		var localjson = this.readLocalJson(keys);
 		
-		console.log('searching in keys ' + JSON.stringify(keys) + ' uuid ' + uuid);
+		console.log('searching in keys ' + JSON.stringify(keys) + ' ' + fieldname + ' ' + uuid);
 		
-		return this._findJsonLeaf(localjson, uuid);
+		return this._findJsonLeaf(localjson, uuid, fieldname);
 	}
 	
-	_replaceJsonLeaves(parentjson, uuid, childjson) {
+	_replaceJsonLeaves(parentjson, uuid, uuidfieldname, childjson) {
 		if (!parentjson)
 			return;
 
 		var self = this;
+		var fieldname = (uuidfieldname ? uuidfieldname : 'uuid');
 		
 		Object.keys(parentjson).forEach(function(key) {
 			
-			if (self._hasItemUUID(parentjson[key], uuid)) {
+			if (self._hasItemUUID(parentjson[key], uuid, fieldname)) {
 				//console.log('replacing for key ' + key + ' json ' + JSON.stringify(parentjson[key]));
 				//console.log('by json ' + JSON.stringify(childjson));
 				
@@ -136,19 +141,22 @@ var LocalStorage = class {
 		});
 	}
 	
-	updateLocalJsonLeaf(keys, uuid, json) {
-		console.log('update json leaf with uuid ' + uuid);
+	updateLocalJsonLeaf(keys, uuid, json, uuidfieldname) {
+		var fieldname = (uuidfieldname ? uuidfieldname : 'uuid');
+		console.log('update json leaf with ' + fieldname + ' ' + uuid);
 
 		var session = this.session;
 		var localjson = this.readLocalJson(keys);
+		console.log('local json is ' + JSON.stringify(localjson));
 		
-		this._replaceJsonLeaves(localjson, uuid, json);
+		this._replaceJsonLeaves(localjson, uuid, fieldname, json);
 		
 		this.saveLocalJson(keys, localjson);
 	}
 	
-	insertLocalJsonLeaf(keys, parentuuid, collectionname, json) {
-		console.log('insert json leaf under uuid ' + parentuuid + ' with uuid ' + json['uuid'] + ' for collection ' + collectionname);
+	insertLocalJsonLeaf(keys, parentuuid, collectionname, json, uuidfieldname) {
+		var fieldname = (uuidfieldname ? uuidfieldname : 'uuid');
+		console.log('insert json leaf under ' + fieldname + ' ' + parentuuid + ' with ' + fieldname + ' ' + json[fieldname] + ' for collection ' + collectionname);
 
 		var session = this.session;
 		var localjson = this.readLocalJson(keys);
@@ -156,7 +164,7 @@ var LocalStorage = class {
 		if (!localjson)
 			localjson = [];
 		
-		var parentjson = (parentuuid ? this._findJsonLeaf(localjson, parentuuid) : localjson);
+		var parentjson = (parentuuid ? this._findJsonLeaf(localjson, parentuuid, fieldname) : localjson);
 		var collectionjsonarray = (collectionname ? parentjson[collectionname] : parentjson);
 		
 		if (!collectionjsonarray) {
@@ -171,17 +179,23 @@ var LocalStorage = class {
 		collectionjsonarray.push(json);
 		
 		this.saveLocalJson(keys, localjson);
-	}	
+	}
+	
+	
 	// read and save
 	readLocalJson(keys, bForceRefresh, callback) {
 		var self = this;
 		var key = this.keystostring(keys);
 		//var jsonstring = localStorage.getItem(key.toString());
 		
+		console.log("readLocalJson for key " + key.toString() + " with refresh flag " + bForceRefresh);
+		
 		var entry = this.storagemap.getKeyJson(key);
 		
 		if ((entry) && (!bForceRefresh) && (bForceRefresh != true)) {
-			return this.storagemap.getKeyJson(key);
+			console.log("readLocalJson json in cache for key " + key.toString() + " is " + JSON.stringify(entry));
+			
+			return entry;
 		}
 		
 		var storageaccess = this.getStorageAccessInstance();
@@ -224,19 +238,22 @@ var LocalStorage = class {
 		
 		console.log("saveLocalJson: local storage json for key " + key.toString() + " is " + JSON.stringify(json));
 		
-		this.storagemap.updateJson(key, json);
-		
 		if (this.session.isAnonymous()) {
 			storageaccess.saveClientSideJson(keys, json);
+			
+			this.storagemap.updateJson(key, json);
 			
 			if (callback)
 				callback(null, json);
 		}
 		else {
+			var self = this;
+			
 			storageaccess.saveUserJson(keys, json, function(err, res) {
-				console.log("user json saved for key " + key);
-				
 				var returnedjson = res;
+				
+				// update cache now with the saved version
+				self.storagemap.updateJson(key, returnedjson);
 				
 				if (callback)
 					callback(null, returnedjson);
