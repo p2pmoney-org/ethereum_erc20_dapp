@@ -118,8 +118,9 @@ class App {
 			var $state = $injector.get('$state');
 			
 			if ($state.current.name != 'home') {
-				console.log("jumping to home");
-				$timeout(function() {$state.go('home');}, 200); // waiting to avoid 'The transition has been superseded...'
+				console.log("starting on page " + $state.current.name);
+				//console.log("jumping to home");
+				//$timeout(function() {$state.go('home');}, 200); // waiting to avoid 'The transition has been superseded...'
 			}
 		}]);
 		

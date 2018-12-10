@@ -161,6 +161,7 @@ var Module = class {
 	}
 	
 	// local persistence (as opposed to chain persistence)
+	// from cache
 	readLocalJson(session, keys) {
 		var commonkeys = ['common'];
 		
@@ -171,16 +172,6 @@ var Module = class {
 		var json = localstorage.readLocalJson(_keys);
 		
 		return json;
-	}
-	
-	saveLocalJson(session, keys, json) {
-		var commonkeys = ['common'];
-		
-		var _keys = commonkeys.concat(keys);
-		
-		var localstorage = session.getLocalStorageObject();
-
-		localstorage.saveLocalJson(_keys, json);
 	}
 	
 	getLocalJsonLeaf(session, keys, uuid, uuidfieldname) {
@@ -209,6 +200,18 @@ var Module = class {
 		var localstorage = this.session.getLocalStorageObject();
 		return localstorage.insertLocalJsonLeaf(_keys, parentuuid, collectionname, json, uuidfieldname);
 	}
+	
+	// async
+	saveLocalJson(session, keys, json, callback) {
+		var commonkeys = ['common'];
+		
+		var _keys = commonkeys.concat(keys);
+		
+		var localstorage = session.getLocalStorageObject();
+
+		localstorage.saveLocalJson(_keys, json, callback);
+	}
+	
 	
 	// session
 	getSessionObject() {

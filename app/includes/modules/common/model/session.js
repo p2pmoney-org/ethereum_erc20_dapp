@@ -591,32 +591,33 @@ var Session = class {
 			var rsapublickey = key['rsa_public_key'];
 			var description = key['description'];
 			
+			var account = commonmodule.createBlankAccountObject();
+			
+			account.setAccountUUID(keyuuid);
+			account.setDescription(description);
+			
+			
 			if (privatekey) {
-				var account = commonmodule.createBlankAccountObject();
-				
-				account.setAccountUUID(keyuuid);
-				
-				account.setPrivateKey(privatekey);
-				
-				account.setDescription(description);
-				
-				//user.addAccountObject(account);
-				account.setOwner(user);
-				session.addAccountObject(account);
-				
-				accountarray.push(account);
+				try {
+					account.setPrivateKey(privatekey);
+					
+					//user.addAccountObject(account);
+					account.setOwner(user);
+					session.addAccountObject(account);
+					
+					accountarray.push(account);
+				}
+				catch(e) {
+					console.log('exception while adding internal accounts: ' + e);
+				}
 			}
 			else {
 				// simple account, not a session account
-				var account = commonmodule.createBlankAccountObject();
-				
 				try {
 					account.setAddress(address);
 					account.setPublicKey(publickey);
 					account.setRsaPublicKey(rsapublickey);
 				
-					account.setDescription(description);
-					
 					session.addAccountObject(account);
 					
 					accountarray.push(account);

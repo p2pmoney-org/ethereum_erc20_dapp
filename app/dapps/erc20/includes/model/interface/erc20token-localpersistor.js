@@ -9,23 +9,30 @@ var ERC20TokenLocalPersistor = class {
 		this.commonmodule = this.session.getGlobalObject().getModuleObject('common');
 	}
 	
-	saveERC20TokenJson(erc20token) {
+	saveERC20TokenJson(erc20token, callback) {
 		var session = this.session;
 		var keys = ['contracts'];
 		
 		var uuid = erc20token.getUUID();
 		var json = erc20token.getLocalJson();
 		
+		console.log('ERC20TokenLocalPersistor.saveERC20TokenJson json to save is ' + JSON.stringify(json));
+		
+		// update cache
 		var commonmodule = this.commonmodule;
 		
 		var jsonleaf = commonmodule.getLocalJsonLeaf(session, keys, uuid);
-		
 		if (jsonleaf) {
 			commonmodule.updateLocalJsonLeaf(session, keys, uuid, json);
 		}
 		else {
 			commonmodule.insertLocalJsonLeaf(session, keys, null, null, json);
 		}
+		
+		// save contracts
+		var contractsjson = commonmodule.readLocalJson(session, keys); // from cache, since no refresh
+		
+		commonmodule.saveLocalJson(session, keys, contractsjson, callback);
 	}
 	
 }

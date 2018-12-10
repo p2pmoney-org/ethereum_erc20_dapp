@@ -3,16 +3,14 @@
     <table class="table-contract-list">
     
 		<tr>
-	    	<td>{{'uuid' | transl}}</td>
-	    	<td>{{'description' | transl}}</td>
 	    	<td>{{'address' | transl}}</td>
+	    	<td>{{'description' | transl}}</td>
 	     	<td>{{'public key' | transl}}</td>
      	</tr>
         
         <tr ng-repeat="cryptokey in cryptokeys" class="{{$odd ? 'table-contract-list-tr-local-odd' : 'table-contract-list-tr-local-even'}}">
-			<td>{{cryptokey.uuid}}</td>
-			<td>{{cryptokey.description}}</td>
 			<td>{{cryptokey.address}}</td>
+			<td>{{cryptokey.description}}</td>
 			<td>{{cryptokey.public_key}}</td>
        </tr>
 

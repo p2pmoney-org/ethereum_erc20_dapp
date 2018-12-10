@@ -5,12 +5,16 @@
     
 		<tr>
 	    	<td>{{'Address' | transl}}</td>
+	    	<td>{{'Description' | transl}}</td>
 	    	<td>{{'Position' | transl}}</td>
+ 	    	<td>{{'Balance' | transl}}</td>
     	</tr>
         
         <tr ng-repeat="accountposition in accountpositions" class="{{$odd ? 'table-contract-list-tr-local-odd' : 'table-contract-list-tr-local-even'}}">
 			<td><a ui-sref="home.erc20tokens.view.account({uuid: accountposition.erc20tokenuuid, address: accountposition.address})">{{accountposition.address}}</a></td>
+	        <td>{{accountposition.description}}</td>
 	        <td>{{accountposition.balance}}</td>
+	        <td>{{accountposition.ether_balance}}</td>
         </tr>
 
     </table>

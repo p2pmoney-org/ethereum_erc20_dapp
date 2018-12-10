@@ -127,8 +127,8 @@ var LocalStorage = class {
 		Object.keys(parentjson).forEach(function(key) {
 			
 			if (self._hasItemUUID(parentjson[key], uuid, fieldname)) {
-				//console.log('replacing for key ' + key + ' json ' + JSON.stringify(parentjson[key]));
-				//console.log('by json ' + JSON.stringify(childjson));
+				console.log('replacing for key ' + key + ' json ' + JSON.stringify(parentjson[key]));
+				console.log('by json ' + JSON.stringify(childjson));
 				
 				delete parentjson[key];
 				parentjson[key] = childjson;
@@ -151,7 +151,7 @@ var LocalStorage = class {
 		
 		this._replaceJsonLeaves(localjson, uuid, fieldname, json);
 		
-		this.saveLocalJson(keys, localjson);
+		//this.saveLocalJson(keys, localjson);
 	}
 	
 	insertLocalJsonLeaf(keys, parentuuid, collectionname, json, uuidfieldname) {
@@ -178,11 +178,12 @@ var LocalStorage = class {
 		
 		collectionjsonarray.push(json);
 		
-		this.saveLocalJson(keys, localjson);
+		//this.saveLocalJson(keys, localjson);
 	}
 	
 	
 	// read and save
+	// (async methods)
 	readLocalJson(keys, bForceRefresh, callback) {
 		var self = this;
 		var key = this.keystostring(keys);

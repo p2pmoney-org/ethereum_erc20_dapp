@@ -1,20 +1,6 @@
 <div class="container">
 
-<h2>{{'ERC20 Token' | transl}}</h2>
-
-<div id="view-band" class="view-band">
-
-<div class="div-view-container" >
-
-<div ng-include='"./dapps/erc20/angular-ui/partials/erc20token-cover-view.html"'></div>
-
-</div><!-- div-view-container -->
-
-</div><!-- view-band -->
-
 <div  ng-if="!session.isanonymous">
-
-<div class="band-separator"><hr></div>
 
 <h2>{{'Account Positions' | transl}}</h2>
 
@@ -28,6 +14,21 @@
 
 </div><!-- view-band -->
 
-</div><!-- accounts-positions -->
+<div class="band-separator"><hr></div>
+</div><!-- !session.isanonymous -->
+
+<h2>{{'ERC20 Token' | transl}}</h2>
+
+<div id="view-band" class="view-band">
+
+<div class="div-view-container" >
+
+<div ng-include='"./dapps/erc20/angular-ui/partials/erc20token-cover-view.html"'></div>
+
+</div><!-- div-view-container -->
+
+</div><!-- view-band -->
+
+
 
 </div><!-- /.container -->

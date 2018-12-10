@@ -157,12 +157,12 @@ var ERC20Token = class {
 		return json;
 	}
 	
-	saveLocalJson() {
+	saveLocalJson(callback) {
 		console.log('ERC20Token.saveLocalJson called for ' + this.address);
 
 		var persistor = this.getContractLocalPersistor();
 		
-		persistor.saveERC20TokenJson(this);
+		persistor.saveERC20TokenJson(this, callback);
 	}
 	
 	
@@ -197,174 +197,6 @@ var ERC20Token = class {
 		// 3 local live status STATUS_LOCAL, STATUS_SENT, STATUS_PENDING
 		// 2 chain live status STATUS_NOT_FOUND, STATUS_ON_CHAIN
 		return this.livestatus;
-	}
-	
-	checkStatus(callback) {
-		var self = this;
-		
-		// 2 chain live status STATUS_NOT_FOUND, STATUS_ON_CHAIN
-
-		if (this.address == null) {
-			var status = this.getStatus();
-			var callbacknow = true;
-			
-			switch(status) {
-				case this.Contracts.STATUS_LOCAL:
-				case this.Contracts.STATUS_LOST:
-				case this.Contracts.STATUS_CANCELLED:
-				case this.Contracts.STATUS_REJECTED:
-					this.livestatus = this.Contracts.STATUS_LOCAL;
-					break; // pure local
-				
-				case this.Contracts.STATUS_SENT:
-				case this.Contracts.STATUS_PENDING: {
-					// check if we can find address from our uuid
-					var transactionuuid = this.getUUID();
-					callbacknow = false;
-					
-					var contractinterface = this.getContractInterface();
-					
-					contractinterface.getAddressFromTransactionUUID(transactionuuid, function(err, res) {
-						if (res) {
-							var address = res;
-							console.log('found address ' + address + ' for transaction ' + transactionuuid);
-							
-							self.setAddress(address);
-							self.setStatus(self.Contracts.STATUS_DEPLOYED);
-							self.livestatus = self.Contracts.STATUS_ON_CHAIN;
-
-							status = self.getStatus();
-							
-							if (callback)
-								callback(null, status);
-						}
-						else {
-							self.livestatus = status;
-						}
-					});
-				}
-					break; // in the process
-				
-				case this.Contracts.STATUS_DEPLOYED: {
-					// abnormal since we don't have an address
-					console.log('Abnormal status for ' + self.local_name);
-
-					// check if we can find address from our uuid
-					var transactionuuid = this.getUUID();
-					callbacknow = false;
-					
-					var contractinterface = this.getContractInterface();
-					
-					contractinterface.getAddressFromTransactionUUID(transactionuuid, function(err, res) {
-						if (res) {
-							var address = res;
-							console.log('found address ' + address + ' for transaction ' + transactionuuid);
-							
-							self.setAddress(address);
-							self.livestatus = self.Contracts.STATUS_ON_CHAIN;
-							
-							if (callback)
-								callback(null, status);
-						}
-						else {
-							self.livestatus = self.Contracts.STATUS_NOT_FOUND;
-						}
-					});
-				}
-					break; // reached a chain
-					
-				case this.Contracts.STATUS_NOT_FOUND:
-				case this.Contracts.STATUS_ON_CHAIN:
-					// abnormal since this is not a saved status
-					console.log('Abnormal status for ' + self.local_name);
-					this.setStatus(self.Contracts.STATUS_LOST);
-					this.livestatus = status;
-					break; // live status only flags
-				
-				default:
-					break;
-			}
-			
-			if ((callback) && (callbacknow))
-				callback(null, status);
-			
-			return status;
-		}
-		else {
-			// check to see if this address is a token contract
-			// on the current block chain
-			this.getChainSymbol(function(err, res) {
-				var currentstatus = self.getStatus();
-				
-				// has been deployed
-				// but not on this blockchain
-				switch(currentstatus) {
-					case self.Contracts.STATUS_LOCAL:
-					case self.Contracts.STATUS_LOST:
-					case self.Contracts.STATUS_CANCELLED:
-					case self.Contracts.STATUS_REJECTED: {
-						// abnormal since we have an address
-						console.log('Abnormal status for ' + self.local_name);
-						if ((err) || (!res)) {
-							self.setStatus(self.Contracts.STATUS_DEPLOYED);
-							self.livestatus = self.Contracts.STATUS_NOT_FOUND;
-						}
-						else {
-							self.setStatus(self.Contracts.STATUS_DEPLOYED);
-							self.livestatus = self.Contracts.STATUS_ON_CHAIN;
-						}
-					}
-						break; // pure local
-
-					case self.Contracts.STATUS_SENT:
-					case self.Contracts.STATUS_PENDING: {
-						// abnormal
-						console.log('Abnormal status for ' + self.local_name);
-						if (res) {
-							self.setStatus(self.Contracts.STATUS_DEPLOYED);
-							self.livestatus = self.Contracts.STATUS_ON_CHAIN;
-						}
-						else{
-							self.livestatus = currentstatus;
-						}
-					}
-						break; // in the process
-
-					case self.Contracts.STATUS_DEPLOYED:
-						if (res) {
-							// found on this blockchain
-							self.livestatus = self.Contracts.STATUS_ON_CHAIN;
-						}
-						else {
-							self.livestatus = self.Contracts.STATUS_NOT_FOUND;
-						}
-						break; // reached a chain
-					
-					case self.Contracts.STATUS_NOT_FOUND:
-					case self.Contracts.STATUS_ON_CHAIN: {
-						// abnormal since this is a live status flag
-						console.log('Abnormal status for ' + self.local_name);
-						
-						self.setStatus(self.Contracts.STATUS_DEPLOYED);
-						self.livestatus = currentstatus;
-					}
-						break;
-					
-					default:
-						self.setStatus(self.Contracts.STATUS_UNKOWN);
-						break;
-				}
-
-
-				var status = self.getStatus();
-				
-				if (callback)
-					callback(null, status);
-				
-				return status;
-			});
-		}
-		
 	}
 	
 	setStatus(status) {
@@ -518,6 +350,183 @@ var ERC20Token = class {
 	//
 	// asynchronous methods
 	//
+	
+	checkStatus(callback) {
+		var self = this;
+		
+		var promise = new Promise(function (resolve, reject) {
+			if (self.address == null) {
+				var status = self.getStatus();
+				var callbacknow = true;
+				
+				switch(status) {
+					case self.Contracts.STATUS_LOCAL:
+					case self.Contracts.STATUS_LOST:
+					case self.Contracts.STATUS_CANCELLED:
+					case self.Contracts.STATUS_REJECTED:
+						self.livestatus = self.Contracts.STATUS_LOCAL;
+						break; // pure local
+					
+					case self.Contracts.STATUS_SENT:
+					case self.Contracts.STATUS_PENDING: {
+						// check if we can find address from our uuid
+						var transactionuuid = self.getUUID();
+						callbacknow = false;
+						
+						var contractinterface = self.getContractInterface();
+						
+						contractinterface.getAddressFromTransactionUUID(transactionuuid, function(err, res) {
+							if (res) {
+								var address = res;
+								console.log('found address ' + address + ' for transaction ' + transactionuuid);
+								
+								self.setAddress(address);
+								self.setStatus(self.Contracts.STATUS_DEPLOYED);
+								self.livestatus = self.Contracts.STATUS_ON_CHAIN;
+
+								status = self.getStatus();
+								
+								if (callback)
+									callback(null, status);
+							}
+							else {
+								self.livestatus = status;
+							}
+						});
+					}
+						break; // in the process
+					
+					case self.Contracts.STATUS_DEPLOYED: {
+						// abnormal since we don't have an address
+						console.log('Abnormal status for ' + self.local_name);
+
+						// check if we can find address from our uuid
+						var transactionuuid = self.getUUID();
+						callbacknow = false;
+						
+						var contractinterface = self.getContractInterface();
+						
+						contractinterface.getAddressFromTransactionUUID(transactionuuid, function(err, res) {
+							if (res) {
+								var address = res;
+								console.log('found address ' + address + ' for transaction ' + transactionuuid);
+								
+								self.setAddress(address);
+								self.livestatus = self.Contracts.STATUS_ON_CHAIN;
+								
+								if (callback)
+									callback(null, status);
+							}
+							else {
+								self.livestatus = self.Contracts.STATUS_NOT_FOUND;
+							}
+						});
+					}
+						break; // reached a chain
+						
+					case self.Contracts.STATUS_NOT_FOUND:
+					case self.Contracts.STATUS_ON_CHAIN:
+						// abnormal since this is not a saved status
+						console.log('Abnormal status for ' + self.local_name);
+						self.setStatus(self.Contracts.STATUS_LOST);
+						self.livestatus = status;
+						break; // live status only flags
+					
+					default:
+						break;
+				}
+				
+				if ((callback) && (callbacknow))
+					callback(null, status);
+				
+				resolve(status);
+				
+				return status;
+			}
+			else {
+				// check to see if this address is a token contract
+				// on the current block chain
+				self.getChainSymbol(function(err, res) {
+					var currentstatus = self.getStatus();
+					
+					// has been deployed
+					// but not on this blockchain
+					switch(currentstatus) {
+						case self.Contracts.STATUS_LOCAL:
+						case self.Contracts.STATUS_LOST:
+						case self.Contracts.STATUS_CANCELLED:
+						case self.Contracts.STATUS_REJECTED: {
+							// abnormal since we have an address
+							console.log('Abnormal status for ' + self.local_name);
+							if ((err) || (!res)) {
+								self.setStatus(self.Contracts.STATUS_DEPLOYED);
+								self.livestatus = self.Contracts.STATUS_NOT_FOUND;
+							}
+							else {
+								self.setStatus(self.Contracts.STATUS_DEPLOYED);
+								self.livestatus = self.Contracts.STATUS_ON_CHAIN;
+							}
+						}
+							break; // pure local
+
+						case self.Contracts.STATUS_SENT:
+						case self.Contracts.STATUS_PENDING: {
+							// abnormal
+							console.log('Abnormal status for ' + self.local_name);
+							if (res) {
+								self.setStatus(self.Contracts.STATUS_DEPLOYED);
+								self.livestatus = self.Contracts.STATUS_ON_CHAIN;
+							}
+							else{
+								self.livestatus = currentstatus;
+							}
+						}
+							break; // in the process
+
+						case self.Contracts.STATUS_DEPLOYED: {
+							 // reached a chain, somewhere
+							if (res) {
+								// found on this blockchain
+								self.livestatus = self.Contracts.STATUS_ON_CHAIN;
+							}
+							else {
+								self.livestatus = self.Contracts.STATUS_NOT_FOUND;
+							}
+						}
+							break;
+						
+						case self.Contracts.STATUS_NOT_FOUND:
+						case self.Contracts.STATUS_ON_CHAIN: {
+							// abnormal since this is a live status flag
+							console.log('Abnormal status for ' + self.local_name);
+							
+							self.setStatus(self.Contracts.STATUS_DEPLOYED);
+							self.livestatus = currentstatus;
+						}
+							break;
+						
+						default:
+							self.setStatus(self.Contracts.STATUS_UNKOWN);
+							break;
+					}
+
+
+					var status = self.getStatus();
+					
+					if (callback)
+						callback(null, status);
+					
+					resolve(status);
+
+					return status;
+				});
+			}
+			
+		});
+		
+		return promise;
+	}
+	
 	
 	getChainName(callback) {
 		console.log('ERC20Token.getChainName called for ' + this.address);

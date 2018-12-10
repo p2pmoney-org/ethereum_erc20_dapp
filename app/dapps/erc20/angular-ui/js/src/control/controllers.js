@@ -233,6 +233,9 @@ var DAPPControllers = class {
 				// tell scope a value has changed
 				$scope.$apply();
 			})
+			.catch(err => {
+			    console.log('getChainName error', err);
+			});
 		};
 
 	    var writestatus = function (contract, erc20token) {
@@ -262,7 +265,10 @@ var DAPPControllers = class {
 				// tell scope a value has changed
 				if (refresh)
 				$scope.$apply();
-			})
+			})			
+			.catch(err => {
+			    console.log('checkStatus error', err);
+			});
 		};
 		
 	    var writesymbol = function (contract, erc20token) {
@@ -280,7 +286,10 @@ var DAPPControllers = class {
 				
 				// tell scope a value has changed
 				$scope.$apply();
-			})
+			})			
+			.catch(err => {
+			    console.log('writesymbol error', err);
+			});
 		};
 
 		
@@ -299,7 +308,10 @@ var DAPPControllers = class {
 				
 				// tell scope a value has changed
 				$scope.$apply();
-			})
+			})			
+			.catch(err => {
+			    console.log('writedecimals error', err);
+			});
 		};
 
 	    var writetotalsupply = function (contract, erc20token) {
@@ -317,7 +329,10 @@ var DAPPControllers = class {
 				
 				// tell scope a value has changed
 				$scope.$apply();
-			})
+			})			
+			.catch(err => {
+			    console.log('writetotalsupply error', err);
+			});
 		};
 
 		
@@ -450,7 +465,15 @@ var DAPPControllers = class {
 			};	
 			
 			$scope.localsymbol = {
-					text: erc20tokencontract.getLocalName()
+					text: erc20tokencontract.getLocalSymbol()
+			};	
+			
+			$scope.localdecimals = {
+					text: erc20tokencontract.getLocalDecimals()
+			};	
+			
+			$scope.localtotalsupply = {
+					text: erc20tokencontract.getLocalTotalSupply()
 			};	
 			
 			$scope.status = {
@@ -496,6 +519,42 @@ var DAPPControllers = class {
 			if (erc20tokencontract.isLocalOnly() == false)
 				writesymbol(erc20tokencontract);
 			
+			// decimals
+			$scope.chaindecimals = {
+					text: (erc20tokencontract.isLocalOnly() ? global.t('not deployed yet') : global.t('loading'))
+			};
+			
+			var writedecimals = function (contract) {
+				return contract.getChainDecimals(function(err, res) {
+					if (res) $scope.chaindecimals.text = res;
+					
+					if (err) $scope.chaindecimals.text = global.t('not found');
+					
+					$scope.$apply();
+				})
+			};
+
+			if (erc20tokencontract.isLocalOnly() == false)
+				writedecimals(erc20tokencontract);
+			
+			// decimals
+			$scope.chaintotalsupply = {
+					text: (erc20tokencontract.isLocalOnly() ? global.t('not deployed yet') : global.t('loading'))
+			};
+			
+			var writetotalsupply = function (contract) {
+				return contract.getChainTotalSupply(function(err, res) {
+					if (res) $scope.chaintotalsupply.text = res;
+					
+					if (err) $scope.chaintotalsupply.text = global.t('not found');
+					
+					$scope.$apply();
+				})
+			};
+
+			if (erc20tokencontract.isLocalOnly() == false)
+				writetotalsupply(erc20tokencontract);
+			
 			// live status
 			$scope.livestatus = {
 					text: livestatusstring
@@ -528,6 +587,7 @@ var DAPPControllers = class {
 		var accountpositions = [];
 		
 		if (erc20tokencontract) {
+			var symbol = erc20tokencontract.getLocalSymbol();
 			// get list of our accounts
 			var accountarray = session.getSessionAccountObjects();
 			
@@ -538,21 +598,24 @@ var DAPPControllers = class {
 					if (account) {
 						var accountposition = [];
 						var accountaddress = account.getAddress();
+						var accountdescription = account.getDescription();
 						
 						accountposition['erc20tokenindex'] = erc20tokencontract.getContractIndex();
 						accountposition['erc20tokenuuid'] = erc20tokencontract.getUUID();
 						
 						accountposition['address'] = accountaddress;
+						accountposition['description'] = accountdescription;
 						accountposition['balance'] = global.t('loading');
+						accountposition['ether_balance'] = global.t('loading');
 						
-						// write balance for this account
+						// write token balance for this account
 						var writebalance = function(accountposition, account) {
 							erc20tokencontract.balanceOf(account, function(err, res) {
 								if (err) {
 									accountposition['balance'] = global.t('error');
 								}
 								else {
-									accountposition['balance'] = res;
+									accountposition['balance'] = res + ' ' + symbol;
 								}
 								
 								// tell scope a value has changed
@@ -561,6 +624,25 @@ var DAPPControllers = class {
 						};
 						
 						writebalance(accountposition, account);
+						
+						
+						// write ether balance for this account
+						var writeetherbalance = function(accountposition, account) {
+							account.getChainBalance(function(err, res) {
+								if (err) {
+									accountposition['ether_balance'] = global.t('error');
+								}
+								else {
+									var etherbalance = commoncontrollers.getEtherStringFromWei(res);
+									accountposition['ether_balance'] = etherbalance + ' ETH';
+								}
+								
+								// tell scope a value has changed
+								$scope.$apply();
+							});
+						};
+						
+						writeetherbalance(accountposition, account);
 						
 						
 						accountpositions.push(accountposition);
@@ -668,27 +750,57 @@ var DAPPControllers = class {
 				// start a promise chain, to collect name, symbol,..
 				console.log("starting retrieving chain data");
 
-				var name;
 				var promise = contract.getChainName(function(err, res) {
-					name = res;
+					var name = res;
 					
 					console.log("chain name is " + res);
 					
+					contract.setLocalName(name);
+
+					return res;
+				})
+				.then(function(res) {
 					return contract.getChainSymbol(function(err, res) {
-						return res;
-					}).then(function(symbol) {
+						var symbol = res;
 						
-						contract.setLocalName(name);
+						console.log("symbol is " + res);
+						
 						contract.setLocalSymbol(symbol);
 						
-						// save erc20token
-						erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
-							self.getAngularControllers().gotoStatePage('home.erc20tokens');
-						});
+						return res;
+					})
+				})
+				.then(function(res) {
+					return contract.getChainDecimals(function(err, res) {
+						var decimals = res;
 						
-						console.log("deployed contract completely retrieved");
+						console.log("decimals is " + res);
+						
+						contract.setLocalDecimals(decimals);
+						
+						return res;
+					})
+				})
+				.then(function(res) {
+					return contract.getChainTotalSupply(function(err, res) {
+						var totalsupply = res;
+						
+						console.log("total supply is " + res);
+						
+						contract.setLocalTotalSupply(totalsupply);
+						
+						return res;
+					})
+				})
+				.then( function (res) {
+					
+					console.log("deployed contract completely retrieved");
 
-						app.setMessage("deployed contract completely retrieved");
+					app.setMessage("deployed contract completely retrieved");
+					
+					// save erc20token
+					return erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
+						self.getAngularControllers().gotoStatePage('home.erc20tokens');
 					});
 				});
 			});

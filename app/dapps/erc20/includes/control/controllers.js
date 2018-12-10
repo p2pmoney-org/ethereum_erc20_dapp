@@ -220,7 +220,7 @@ var ModuleControllers = class {
 		if (!contract)
 			return;
 		
-		console.log("Controllers.saveERC20TokenObject called for contract index " + contract.getContractIndex());
+		console.log("Controllers.saveERC20TokenObject called for contract uuid " + contract.getUUID());
 
 		var module = this.module;
 		var global = module.global;
@@ -231,21 +231,30 @@ var ModuleControllers = class {
 		var contracts = session.getContractsObject();
 		
 		var contractindex = contract.getContractIndex();
+		var contractuuid = contract.getUUID();
 		
-		if (!contracts.getContractObjectFromKey(contractindex)) {
+		/*if (!contracts.getContractObjectFromUUID(contractuuid)) {
 			// insert
 			contracts.addContractObject(contract);
+			
+			session.saveContractObjects(contracts, function(err, res) {
+				if (callback)
+					callback(err, contracts);
+			});
 		}
 		else {
 			// update
-			contract.saveLocalJson();
-		}
+			contract.saveLocalJson(function(err, res) {
+				if (callback)
+					callback(err, contracts);
+			});
+		}*/
 
-		
-		session.saveContractObjects(contracts, function(err, res) {
+		contract.saveLocalJson(function(err, res) {
 			if (callback)
 				callback(err, contracts);
 		});
+		
 	}
 
 	saveERC20Tokens(callback) {

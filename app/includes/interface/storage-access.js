@@ -275,6 +275,60 @@ class StorageAccess {
 		
 		return promise;
 	}
+	
+	user_update_account(user, account, callback) {
+		console.log("StorageAccess.user_update_account called");
+		
+		var self = this;
+		var session = this.session;
+		var global = session.getGlobalObject();
+		var cryptoencryptionmodule = global.getModuleObject('cryptokey-encryption');
+		
+		var promise = new Promise(function (resolve, reject) {
+			var keys = ['accounts'];
+			
+			var uuid = account.getAccountUUID();
+			
+			if (!uuid) {
+				throw 'account has not uuid, can not update it';
+			}
+			
+
+			var description = account.getDescription();
+
+			var privatekey = account.getPrivateKey();
+			var cryptokey = cryptoencryptionmodule.pickCryptoKeyEncryptionInstance(session);
+			var encryptedprivatekey = cryptoencryptionmodule.encryptPrivateKey(privatekey, cryptokey);
+				
+			
+			// local storage
+			var commonmodule = global.getModuleObject('common');
+			
+			var jsonleaf = commonmodule.getLocalJsonLeaf(session, keys, uuid);
+			
+			if (jsonleaf) {
+				var json = {uuid: uuid, 
+							owner_uuid: jsonleaf.owner_uuid, 
+							address: jsonleaf.address, 
+							private_key: jsonleaf.private_key, 
+							description: description
+						}; // can only update description
+				
+				
+				commonmodule.updateLocalJsonLeaf(session, keys, uuid, json);
+			}
+			else {
+				throw 'could not find account with uuid ' + uuid;
+			}
+			
+			if (callback)
+				callback(null, jsonleaf);
+			
+			return resolve(jsonleaf);
+		});
+		
+		return promise;
+	}
 }
 
 
