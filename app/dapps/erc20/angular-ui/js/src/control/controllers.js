@@ -1062,25 +1062,22 @@ var DAPPControllers = class {
 		var fromaccount = commoncontrollers.getSessionAccountObjectFromUUID(session, accountuuid)
 
 		if (fromaccount) {
-			var frominput = document.getElementById("form-from-input");
+			$scope.from = { text: fromaccount.getAddress()};
 			
-			if (frominput) {
-				frominput.value = fromaccount.getAddress();
-				
-				// refresh divcue
-				
-				var contractuuid = $scope.erc20token.uuid;
+			$scope.walletused = { text: fromaccount.getAddress()};
+			
+			// refresh divcue
+			var contractuuid = $scope.erc20token.uuid;
 
-				// token contract
-				var erc20tokenmodule = global.getModuleObject('erc20');
-				var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
-				
-				var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+			// token contract
+			var erc20tokenmodule = global.getModuleObject('erc20');
+			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
+			
+			var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
 
-				var divcue = document.getElementsByClassName('div-form-cue')[0];
-				
-				var values = erc20tokencontrollers.getAccountTokenTransferDefaultValues(session, erc20tokencontract, fromaccount, divcue);
-			}
+			var divcue = document.getElementsByClassName('div-form-cue')[0];
+			
+			var values = erc20tokencontrollers.getAccountTokenTransferDefaultValues(session, erc20tokencontract, fromaccount, divcue);
 		}
 	}
 	
@@ -1097,10 +1094,7 @@ var DAPPControllers = class {
 		var account = commoncontrollers.getAccountObjectFromUUID(session, accountuuid)
 
 		if (account) {
-			var toinput = document.getElementById("form-to-input");
-			
-			if (toinput)
-				toinput.value = account.getAddress();
+			$scope.to = { text: account.getAddress()};
 		}
 	}
 	
