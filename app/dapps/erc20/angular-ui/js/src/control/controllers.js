@@ -1049,6 +1049,121 @@ var DAPPControllers = class {
 	}
 	
 	// transfers of tokens
+	handleFromAccountSelectChange($scope) {
+		var accountuuid = $scope.selectedfrom;
+		
+		var global = this.global;
+		
+		var commonmodule = global.getModuleObject('common');
+		var commoncontrollers = commonmodule.getControllersObject();
+
+		var session = commonmodule.getSessionObject();
+		
+		var fromaccount = commoncontrollers.getSessionAccountObjectFromUUID(session, accountuuid)
+
+		if (fromaccount) {
+			var frominput = document.getElementById("form-from-input");
+			
+			if (frominput) {
+				frominput.value = fromaccount.getAddress();
+				
+				// refresh divcue
+				
+				var contractuuid = $scope.erc20token.uuid;
+
+				// token contract
+				var erc20tokenmodule = global.getModuleObject('erc20');
+				var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
+				
+				var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+
+				var divcue = document.getElementsByClassName('div-form-cue')[0];
+				
+				var values = erc20tokencontrollers.getAccountTokenTransferDefaultValues(session, erc20tokencontract, fromaccount, divcue);
+			}
+		}
+	}
+	
+	handleToAccountSelectChange($scope) {
+		var accountuuid = $scope.selectedto;
+		
+		var global = this.global;
+		
+		var commonmodule = global.getModuleObject('common');
+		var commoncontrollers = commonmodule.getControllersObject();
+
+		var session = commonmodule.getSessionObject();
+		
+		var account = commoncontrollers.getAccountObjectFromUUID(session, accountuuid)
+
+		if (account) {
+			var toinput = document.getElementById("form-to-input");
+			
+			if (toinput)
+				toinput.value = account.getAddress();
+		}
+	}
+	
+	_getAccountArrays($scope, session) {
+		var self = this;
+		
+		// all accounts
+		var accountarray = session.getAccountObjects();
+		
+		var accounts = [];
+		
+		for (var i = 0; i < (accountarray ? accountarray.length : 0); i++) {
+			var accnt = accountarray[i];
+			
+			var address = accnt.getAddress();
+			var shortaddress = (address ? address.substring(0,4) + '...' + address.substring(address.length - 4,address.length) : '...');
+			
+			var account = [];
+			
+			account['uuid'] = accnt.getAccountUUID();
+			account['address'] = accnt.getAddress();
+			account['description'] = shortaddress + ' - ' + accnt.getDescription();
+			
+			accounts.push(account);
+		}
+			
+			
+		// change function
+		$scope.handleToChange = function(){
+			self.handleToAccountSelectChange($scope);
+		}
+
+		$scope.toaccounts = accounts;
+		
+		// session accounts
+		var sessionaccountarray = session.getSessionAccountObjects();
+		
+		var sessionaccounts = [];
+		
+		for (var i = 0; i < (sessionaccountarray ? sessionaccountarray.length : 0); i++) {
+			var accnt = sessionaccountarray[i];
+			
+			var address = accnt.getAddress();
+			var shortaddress = (address ? address.substring(0,4) + '...' + address.substring(address.length - 4,address.length) : '...');
+			
+			var sessionaccount = [];
+			
+			sessionaccount['uuid'] = accnt.getAccountUUID();
+			sessionaccount['address'] = accnt.getAddress();
+			sessionaccount['description'] = shortaddress + ' - ' + accnt.getDescription();
+			
+			sessionaccounts.push(sessionaccount);
+		}
+			
+			
+		// change function
+		$scope.handleFromChange = function(){
+			self.handleFromAccountSelectChange($scope);
+		}
+
+		$scope.fromaccounts = sessionaccounts;
+
+	}
 
 	prepareERC20TokenAccountTransferForm($scope, $state, $stateParams) {
 		console.log("Controllers.prepareERC20TokenAccountTransferForm called");
@@ -1065,6 +1180,9 @@ var DAPPControllers = class {
 		var commoncontrollers = commonmodule.getControllersObject();
 
 		var session = commonmodule.getSessionObject();
+		
+		// fill account list
+		this._getAccountArrays($scope, session);
 		
 		
 		// account

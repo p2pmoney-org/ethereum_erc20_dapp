@@ -7,12 +7,14 @@
 	
 	<span id="from-span" class="from-span">
 		<label for="from">{{'From:' | transl}}</label>
-		<input type="text" class="form-from-input" name="from" ng-model="from.text" required>
+		<input type="text" class="form-from-input" id="form-from-input" name="from" ng-model="from.text" required><br>
+		<select class="form-from-select" ng-model="selectedfrom" ng-change="handleFromChange()"><option ng-repeat="account in fromaccounts" ng-value="account.uuid">{{account.description}}</option></select>
  	</span>
 	
  	<span id="to-span" class="to-span">
 		<label for="to">{{'To:' | transl}}</label>
-		<input type="text" class="form-to-input" name="to" ng-model="to.text" required>
+		<input type="text" class="form-to-input" id="form-to-input" name="to" ng-model="to.text" required><br>
+		<select class="form-from-select" ng-model="selectedto" ng-change="handleToChange()"><option ng-repeat="account in toaccounts" ng-value="account.uuid">{{account.description}}</option></select>
  	</span>
 	
   	<span id="tokenamount-span" class="token-form-amount-span">

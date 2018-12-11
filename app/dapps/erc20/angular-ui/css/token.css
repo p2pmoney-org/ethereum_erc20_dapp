@@ -11,6 +11,13 @@
   display: none;
 }
 
+.form-from-select {
+  width: 300px;
+}
+
+.form-to-select {
+  width: 300px;
+}
 
 
 /******************/
@@ -62,6 +69,10 @@
 .token-form-description-input {
   width: 250px;
 } 
+
+.token-form-amount-span {
+  vertical-align: text-bottom;
+}
 
 .token-form-amount-input {
   width: 100px;
