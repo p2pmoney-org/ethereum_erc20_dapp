@@ -126,13 +126,13 @@ var Module = class {
 		
 		menuitem.children.push(child);
 		
-		// list on the bockchain
-		child = {};
+		// on the wire
+		/*child = {};
 		
 		child.label = global.t('On the wire');
 		child.state = 'home.erc20tokens.onthewire';
 		
-		menuitem.children.push(child);
+		menuitem.children.push(child);*/
 		
 
 		

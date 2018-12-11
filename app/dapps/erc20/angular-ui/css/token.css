@@ -1,0 +1,69 @@
+/***********************/
+/* overload of app.css */
+/***********************/
+
+
+.form-walletpassword-span label {
+  display: none;
+}
+
+.form-walletpassword-span input {
+  display: none;
+}
+
+
+
+/******************/
+/* token specific */
+/******************/
+
+
+.token-form-walletused-div {
+  display: none;
+}
+
+.token-form-walletused-div span {
+  width: 300px;
+ }
+
+.token-form-walletused-div input {
+  width: 300px;
+}
+
+.token-form-walletpassword-span {
+  display: none;
+}
+
+
+.token-form-walletpassword-span label {
+  display: none;
+}
+
+.token-form-walletpassword-span input {
+  display: none;
+}
+
+.token-form-name-input {
+  width: 150px;
+} 
+
+.token-form-symbol-input {
+  width: 50px;
+} 
+
+.token-form-decimals-input {
+  width: 50px;
+} 
+
+.token-form-totalsupply-input {
+  width: 80px;
+} 
+
+.token-form-description-input {
+  width: 250px;
+} 
+
+.token-form-amount-input {
+  width: 100px;
+} 
+

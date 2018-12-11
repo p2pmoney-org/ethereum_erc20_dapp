@@ -142,7 +142,7 @@ var ModuleControllers = class {
 		if (session) {
 			var sessionaccount = session.getMainSessionAccountObject();
 			
-			if (sessionaccount) {
+			/*if (sessionaccount) {
 				walletaddress = sessionaccount.getAddress();
 			}
 			else {
@@ -154,7 +154,11 @@ var ModuleControllers = class {
 					console.log('not using wallet account');
 					console.log('wallet address is ' + commonmodule.getWalletAccountAddress());
 				}
-			}
+			}*/
+			
+			// erc20token.sol does not support "in name of" transactions
+			// we necessarily user fromaccount as wallet
+			walletaddress = fromaccount.getAddress();
 			
 			if (walletaddress) {
 				
@@ -177,6 +181,8 @@ var ModuleControllers = class {
 		console.log('spawning write of getBalance');
 		var self = this;
 		
+		var innerhtml = ''; // to avoid mvc-controller writing default wallet in-between our promises
+		
 		var res = wallet.getChainBalance(function(err, res) {
 			if (!err) {
 				var global = self.module.global;
@@ -187,7 +193,8 @@ var ModuleControllers = class {
 				var balancetext = commoncontrollers.getEtherStringFromWei(res);
 				
 				console.log('writebalance ether balance is ' + balancetext);
-				divbalance.innerHTML = global.t('The account') + ' ' + wallet.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Ether');
+				innerhtml = global.t('The account') + ' ' + wallet.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Ether');
+				divbalance.innerHTML = innerhtml;
 			}
 			else {
 				console.log('writebalance ether balance error: ' + err);
@@ -201,7 +208,8 @@ var ModuleControllers = class {
 						var balancetext = res;
 						
 						console.log('writebalance token balance is ' + balancetext);
-						divbalance.innerHTML += '<br>' + global.t('The account') + ' ' + account.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Token(s)');
+						innerhtml += '<br>' + global.t('The account') + ' ' + account.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Token(s)');
+						divbalance.innerHTML = innerhtml;
 					}
 					else {
 						console.log('writebalance token balance error: ' + err);

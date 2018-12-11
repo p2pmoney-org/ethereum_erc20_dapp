@@ -28,11 +28,13 @@ contract TokenERC20 {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function TokenERC20(
+    constructor(
         uint256 initialSupply,
         string tokenName,
-        string tokenSymbol
+        string tokenSymbol,
+        uint8 tokenDecimals
     ) public {
+        decimals = tokenDecimals;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes

@@ -4,21 +4,21 @@
   	
   	<div>
 	
- 	<span id="to-span" class="to-span">
+ 	<span id="to-span" class="form-to-span">
 		<label for="to">{{'To:' | transl}}</label>
-		<input type="text" name="from" ng-model="to.text" required>
+		<input type="text" class="form-to-input" name="to" ng-model="to.text" required>
  	</span>
 	
-  	<span id="tokenamount-span" class="tokenamount-span">
+  	<span id="tokenamount-span" class="token-form-amount-span">
 		<label for="tokenamount">{{'Token Amount:' | transl}}</label>
-		<input type="text" name="from" ng-model="tokenamount.text" required>
+		<input type="text" class="token-form-amount-input" name="tokenamount" ng-model="tokenamount.text" required>
  	</span>
 	
  	</div>
  
- 	<div>
+ 	<div class="token-form-walletused-div">
 	
-	<span id="walletused-span" class="walletused-span">
+	<span id="walletused-span">
 		<label for="walletused">{{'Wallet used:' | transl}}</label>
 		<input type="text" name="walletused" ng-model="walletused.text" required>
  	</span>
@@ -26,19 +26,19 @@
  	</div>
  	<div>
 
-	<span id="password-span" class="password-span">
+	<span id="walletpassword-span" class="token-form-walletpassword-span">
 		<label for="password">{{'Password:' | transl}}</label>
-		<input type="password" name="password" ng-model="password.text">
+		<input type="password" class="token-form-walletpassword-input" name="walletpassword" ng-model="password.text">
  	</span>
  	
-	<span id="gaslimit-span" class="gaslimit-span">
+	<span id="gaslimit-span" class="form-gaslimit-span">
 		<label for="gaslimit">{{'Gas limit:' | transl}}</label>
-		<input type="text" name="gaslimit" ng-model="gaslimit.text" required>
+		<input type="text" class="form-gaslimit-input" name="gaslimit" ng-model="gaslimit.text" required>
 	</span>
 	
-	<span id="gasprice-span" class="gasprice-span">
+	<span id="gasprice-span" class="form-gasprice-span">
 		<label for="gasprice">{{'Gas price:' | transl}}</label>
-		<input type="text" name="gasprice" ng-model="gasprice.text" required>
+		<input type="text" class="form-gasprice-input" name="gasprice" ng-model="gasprice.text" required>
 	</span>
 	
   	<span class="form-actions">

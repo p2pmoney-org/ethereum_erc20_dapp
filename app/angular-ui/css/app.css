@@ -128,7 +128,7 @@ header {
 }
 
 .form-description-input {
-  width: 600px;
+  width: 300px;
 }
 
 .form-from-input {
@@ -136,10 +136,6 @@ header {
 }
 
 .form-to-input {
-  width: 300px;
-}
-
-.form-walletused-input {
   width: 300px;
 }
 
@@ -154,6 +150,18 @@ header {
 .form-gaslimit-input {
   width: 100px;
 } 
+
+.form-walletused-input {
+  width: 300px;
+}
+
+
+.form-walletpassword-span {
+}
+
+.form-walletpassword-span input {
+  width: 200px;
+}
 
 
 

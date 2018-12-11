@@ -157,6 +157,7 @@ var ERC20TokenContractInterface = class {
 		args.push(initialSupply);
 		args.push(tokenName);
 		args.push(tokenSymbol);
+		args.push(decimals);
 		
 		contracttransaction.setArguments(args);
 		

@@ -455,7 +455,7 @@ class Controllers {
 						ethaccount['uuid'] = account.getAccountUUID();
 
 						ethaccount['description'] = (account.getDescription() !== null ? account.getDescription() : account.getAddress());
-						ethaccount['yours'] = (account.getPrivateKey() !== null ? global.t('yes') : global.t('no'));
+						ethaccount['type'] = (account.getPrivateKey() !== null ? global.t('personal') : global.t('3rd party'));
 						ethaccount['address'] = account.getAddress();
 						ethaccount['public_key'] = account.getPublicKey();
 						ethaccount['rsa_public_key'] = account.getRsaPublicKey();
@@ -503,7 +503,7 @@ class Controllers {
 					ethaccount['uuid'] = account.getAccountUUID();
 
 					ethaccount['description'] = (account.getDescription() !== null ? account.getDescription() : account.getAddress());
-					ethaccount['yours'] = (account.getPrivateKey() !== null ? global.t('yes') : global.t('no'));
+					ethaccount['type'] = (account.getPrivateKey() !== null ? global.t('personal') : global.t('3rd party'));
 					ethaccount['address'] = account.getAddress();
 					ethaccount['public_key'] = account.getPublicKey();
 					ethaccount['rsa_public_key'] = account.getRsaPublicKey();
@@ -538,7 +538,7 @@ class Controllers {
 			ethaccount['uuid'] = account.getAccountUUID();
 
 			ethaccount['description'] = (account.getDescription() !== null ? account.getDescription() : account.getAddress());
-			ethaccount['yours'] = (account.getPrivateKey() !== null ? global.t('yes') : global.t('no'));
+			ethaccount['type'] = (account.getPrivateKey() !== null ? global.t('personal') : global.t('3rd party'));
 			ethaccount['address'] = account.getAddress();
 			ethaccount['public_key'] = account.getPublicKey();
 			ethaccount['rsa_public_key'] = account.getRsaPublicKey();

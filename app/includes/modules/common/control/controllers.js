@@ -149,6 +149,7 @@ var ModuleControllers = class {
 				var global = self.module.global;
 				var balancetext = self.getEtherStringFromWei(res);
 				
+				console.log('writebalance ether balance is ' + balancetext);
 				divbalance.innerHTML = global.t('The account') + ' ' + wallet.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Ether');
 			}
 			else {
