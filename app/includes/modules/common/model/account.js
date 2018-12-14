@@ -254,20 +254,32 @@ var Account = class {
 	}
 	
 	encryptString(plaintext) {
+		if (!plaintext)
+			return;
+		
 		return this.aesEncryptString(plaintext);
 	}
 	
 	decryptString(ciphertext) {
+		if (!ciphertext)
+			return;
+		
 		return this.aesDecryptString(ciphertext);
 	}
 	
 	// symmetric encryption with the private key
 	aesEncryptString(plaintext) {
+		if (!plaintext)
+			return;
+		
 		return this.accountencryption.aesEncryptString(plaintext);
 	}
 	
-	aesDecryptString(cyphertext) {
-		return this.accountencryption.aesDecryptString(cyphertext);
+	aesDecryptString(ciphertext) {
+		if (!ciphertext)
+			return;
+		
+		return this.accountencryption.aesDecryptString(ciphertext);
 	}
 	
 	// asymmetric encryption with the private/public key pair
@@ -288,11 +300,17 @@ var Account = class {
 	}
 	
 	rsaEncryptString(plaintext, recipientaccount) {
+		if (!plaintext)
+			return;
+		
 		return this.accountencryption.rsaEncryptString(plaintext, recipientaccount);
 	}
 	
-	rsaDecryptString(cyphertext, senderaccount) {
-		return this.accountencryption.rsaDecryptString(cyphertext, senderaccount);
+	rsaDecryptString(ciphertext, senderaccount) {
+		if (!ciphertext)
+			return;
+		
+		return this.accountencryption.rsaDecryptString(ciphertext, senderaccount);
 	}
 	
 	// signature
