@@ -19,6 +19,12 @@
   width: 300px;
 }
 
+.form-amount-span {
+  vertical-align: text-bottom;
+}
+
+
+
 
 /******************/
 /* token specific */

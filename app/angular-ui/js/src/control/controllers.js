@@ -918,6 +918,108 @@ class Controllers {
 
 
 	// ether tranfer
+	handleFromAccountSelectChange($scope) {
+		var accountuuid = $scope.selectedfrom;
+		
+		var global = this.global;
+		
+		var commonmodule = global.getModuleObject('common');
+		var commoncontrollers = commonmodule.getControllersObject();
+
+		var session = commonmodule.getSessionObject();
+		
+		var fromaccount = commoncontrollers.getSessionAccountObjectFromUUID(session, accountuuid)
+
+		if (fromaccount) {
+			$scope.from = { text: fromaccount.getAddress()};
+			
+			$scope.walletused = { text: fromaccount.getAddress()};
+			
+			// refresh divcue
+			var divcue = document.getElementsByClassName('div-form-cue')[0];
+			
+			var values = commoncontrollers.getAccountTransferDefaultValues(session, fromaccount, divcue);
+		}
+	}
+	
+	handleToAccountSelectChange($scope) {
+		var accountuuid = $scope.selectedto;
+		
+		var global = this.global;
+		
+		var commonmodule = global.getModuleObject('common');
+		var commoncontrollers = commonmodule.getControllersObject();
+
+		var session = commonmodule.getSessionObject();
+		
+		var account = commoncontrollers.getAccountObjectFromUUID(session, accountuuid)
+
+		if (account) {
+			$scope.to = { text: account.getAddress()};
+		}
+	}
+	
+	_getAccountArrays($scope, session) {
+		var self = this;
+		
+		// all accounts
+		var accountarray = session.getAccountObjects();
+		
+		var accounts = [];
+		
+		for (var i = 0; i < (accountarray ? accountarray.length : 0); i++) {
+			var accnt = accountarray[i];
+			
+			var address = accnt.getAddress();
+			var shortaddress = (address ? address.substring(0,4) + '...' + address.substring(address.length - 4,address.length) : '...');
+			
+			var account = [];
+			
+			account['uuid'] = accnt.getAccountUUID();
+			account['address'] = accnt.getAddress();
+			account['description'] = shortaddress + ' - ' + accnt.getDescription();
+			
+			accounts.push(account);
+		}
+			
+			
+		// change function
+		$scope.handleToChange = function(){
+			self.handleToAccountSelectChange($scope);
+		}
+
+		$scope.toaccounts = accounts;
+		
+		// session accounts
+		var sessionaccountarray = session.getSessionAccountObjects();
+		
+		var sessionaccounts = [];
+		
+		for (var i = 0; i < (sessionaccountarray ? sessionaccountarray.length : 0); i++) {
+			var accnt = sessionaccountarray[i];
+			
+			var address = accnt.getAddress();
+			var shortaddress = (address ? address.substring(0,4) + '...' + address.substring(address.length - 4,address.length) : '...');
+			
+			var sessionaccount = [];
+			
+			sessionaccount['uuid'] = accnt.getAccountUUID();
+			sessionaccount['address'] = accnt.getAddress();
+			sessionaccount['description'] = shortaddress + ' - ' + accnt.getDescription();
+			
+			sessionaccounts.push(sessionaccount);
+		}
+			
+			
+		// change function
+		$scope.handleFromChange = function(){
+			self.handleFromAccountSelectChange($scope);
+		}
+
+		$scope.fromaccounts = sessionaccounts;
+
+	}
+
 	prepareEtherTransferForm($scope) {
 		console.log("Controllers.prepareEtherTransferForm called");
 
@@ -931,12 +1033,27 @@ class Controllers {
 
 		var session = commonmodule.getSessionObject();
 		
+		// fill account list
+		this._getAccountArrays($scope, session);
+		
+		// display default transfer values (gaslimit, gasprice, default account,;;°
+		var fromaccount;
 		var divcue = document.getElementsByClassName('div-form-cue')[0];
 		
-		var values = commoncontrollers.getSessionTransferDefaultValues(session, divcue);
+		if ($scope.walletused && $scope.walletused.text) {
+			// already set or modified via a select change
+			fromaccount = session.getSessionAccountObject($scope.walletused.text);
+		}
+		
+		if (fromaccount) {
+			var values = commoncontrollers.getAccountTransferDefaultValues(session, fromaccount, divcue);
+		}
+		else {
+			var values = commoncontrollers.getSessionTransferDefaultValues(session, divcue);
+		}
 		
 		// filling fields
-
+		
 		$scope.walletused = {
 				text: (values['walletused'] ? values['walletused'] : null)
 		};

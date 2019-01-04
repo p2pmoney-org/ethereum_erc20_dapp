@@ -157,7 +157,7 @@ var ModuleControllers = class {
 			}*/
 			
 			// erc20token.sol does not support "in name of" transactions
-			// we necessarily user fromaccount as wallet
+			// we necessarily use fromaccount as wallet
 			walletaddress = fromaccount.getAddress();
 			
 			if (walletaddress) {
@@ -183,6 +183,8 @@ var ModuleControllers = class {
 		
 		var innerhtml = ''; // to avoid mvc-controller writing default wallet in-between our promises
 		
+		divbalance.currentwalletaddress = wallet.getAddress();
+
 		var res = wallet.getChainBalance(function(err, res) {
 			if (!err) {
 				var global = self.module.global;
@@ -204,12 +206,15 @@ var ModuleControllers = class {
 			if ((contract) && (account)) {
 				contract.balanceOf(account, function(err, res) {
 					if (!err) {
-						var global = self.module.global;
-						var balancetext = res;
-						
-						console.log('writebalance token balance is ' + balancetext);
-						innerhtml += '<br>' + global.t('The account') + ' ' + account.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Token(s)');
-						divbalance.innerHTML = innerhtml;
+						if (divbalance.currentwalletaddress.toLowerCase()  == wallet.getAddress().toLowerCase()) {
+							// we write the balance, if indeed we are the current wallet selected for the div
+							var global = self.module.global;
+							var balancetext = res;
+							
+							console.log('writebalance token balance is ' + balancetext);
+							innerhtml += '<br>' + global.t('The account') + ' ' + account.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Token(s)');
+							divbalance.innerHTML = innerhtml;
+						}
 					}
 					else {
 						console.log('writebalance token balance error: ' + err);
