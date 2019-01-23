@@ -58,6 +58,11 @@ class Controllers {
 
 		// partials
 		
+		// node info
+		angular_app.controller("NodeInfoViewCtrl",  ['$scope', function ($scope) {
+			controllers.prepareNodeInfoView($scope);
+		}]);
+
 		// account
 		angular_app.controller("AccountViewCtrl",  ['$scope', function ($scope) {
 			controllers.prepareAccountView($scope);
@@ -345,6 +350,78 @@ class Controllers {
 		var message = global.t("Hello, AngularJS");
 		
 		$scope.message = message;	
+	}
+	
+	prepareNodeInfoView($scope) {
+		console.log("Controllers.prepareNodeInfoView called");
+		
+		var global = this.global;
+		var commonmodule = global.getModuleObject('common');
+		
+		var session = commonmodule.getSessionObject();
+		var ethereumnodeaccess = session.getEthereumNodeAccessInstance();
+		
+		var nodeinfo = [];
+		
+		nodeinfo.islistening = global.t('loading');
+		nodeinfo.networkid = global.t('loading');
+		nodeinfo.peercount = global.t('loading');
+		nodeinfo.issyncing = global.t('loading');
+		nodeinfo.currentblock = global.t('loading');
+		nodeinfo.highestblock = global.t('loading');
+		
+		var writenodeinfo = function(nodeinfo) {
+			/*ethereumnodeaccess.web3_isListening(function(err, res) {
+				nodeinfo.islistening = res;
+				
+				// tell scope a value has changed
+				$scope.$apply();
+			});
+			
+			ethereumnodeaccess.web3_getNetworkId(function(err, res) {
+				nodeinfo.networkid = res;
+				
+				// tell scope a value has changed
+				$scope.$apply();
+			});
+			
+			ethereumnodeaccess.web3_getPeerCount(function(err, res) {
+				nodeinfo.peercount = res;
+				
+				// tell scope a value has changed
+				$scope.$apply();
+			});
+			
+			ethereumnodeaccess.web3_isSyncing(function(err, res) {
+				if (res !== false)
+					nodeinfo.issyncing = true;
+				else
+					nodeinfo.issyncing = false;
+				
+				// tell scope a value has changed
+				$scope.$apply();
+			});*/
+			
+			ethereumnodeaccess.web3_getNodeInfo(function(err, info) {
+				console.log('returning from web3_getNodeInfo');
+
+				nodeinfo.islistening = info.islistening;
+				nodeinfo.networkid = info.networkid;
+				nodeinfo.peercount = info.peercount;
+				nodeinfo.issyncing = info.issyncing;
+				nodeinfo.currentblock = info.currentblock;
+				nodeinfo.highestblock = info.highestblock;
+				
+				// tell scope a value has changed
+				$scope.$apply();
+			});
+		};
+		
+		writenodeinfo(nodeinfo);
+		
+		
+		$scope.nodeinfo = nodeinfo;
+		
 	}
 	
 	prepareAccountView($scope) {
