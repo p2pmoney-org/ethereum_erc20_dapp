@@ -9,8 +9,8 @@ var Module = class {
 		this.isready = false;
 		this.isloading = false;
 		
-		//this.web3_version = "1.0.x";
-		this.web3_version = "0.20.x";
+		this.web3_version = "1.0.x";
+		//this.web3_version = "0.20.x";
 		
 		this.ethereum_node_access_instance = null;
 	}
