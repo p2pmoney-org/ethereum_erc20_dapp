@@ -169,6 +169,7 @@ var ERC20TokenContractInterface = class {
 			if (callback)
 				callback(null, res);
 			
+			return res;
 		})
 		.then(function(res) {
 			console.log('ERC20TokenContractInterface.deploy promise of deployment resolved, result is: ' + res);

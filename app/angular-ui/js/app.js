@@ -67,13 +67,16 @@ class App {
 	// view functions
 	getAngularInjector() {
 		var $scope = angular.element(document.getElementById('login-link-div')).scope();
-		var $rootscope = ($scope.$root ? $scope.$root : $scope);
 		
-		console.log('scope is ' + ($scope.$root ? 'not ' : '') + ' root scope');
-		
-		var $injector = $scope.injectorforrefresh;
-		
-		return $injector;
+		if ($scope) {
+			var $rootscope = ($scope.$root ? $scope.$root : $scope);
+			
+			console.log('scope is ' + ($scope.$root ? 'not ' : '') + ' root scope');
+			
+			var $injector = $scope.injectorforrefresh;
+			
+			return $injector;
+		}
 	}
 	
 	refreshDisplay() {
@@ -84,13 +87,15 @@ class App {
 		//var $injector = $scope.injectorforrefresh
 		var $injector = this.getAngularInjector();
 		
-		//console.log('injector properties ' + Object.getOwnPropertyNames($injector));
-		
-		var $state = $injector.get('$state');
-		$state.reload();
+		if ($injector) {
+			//console.log('injector properties ' + Object.getOwnPropertyNames($injector));
+			
+			var $state = $injector.get('$state');
+			$state.reload();
 
-		//window.location.reload();
-		// forces a complete reload
+			//window.location.reload();
+			// forces a complete reload
+		}
 		
 		
 		return;

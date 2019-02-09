@@ -106,7 +106,7 @@ var DAPPControllers = class {
 		// Handlers for requests (clicks, forms,..)
 		//
 		
-		// erc20 tokebs
+		// erc20 tokens
 		angular_app.controller("ERC20TokenRemoveRequestHandler", ['$scope','$state', '$stateParams', function ($scope, $state, $stateParams) {
 			controllers.handleRemoveERC20TokenRequestFromList($scope, $state, $stateParams);
 		}]);
@@ -239,7 +239,7 @@ var DAPPControllers = class {
 		};
 
 	    var writestatus = function (contract, erc20token) {
-	    	var oldstatus = contract.getStatus();
+	    	var oldstatus = contract.getLiveStatus();
 	    	
 			return contract.checkStatus(function(err, res) {
 
@@ -248,10 +248,12 @@ var DAPPControllers = class {
 				}
 				
 				var refresh = false;
-		    	var newstatus = contract.getStatus();
+		    	var newstatus = contract.getLiveStatus();
 
 		    	if (newstatus != oldstatus) {
 		    		erc20token.statusstring = views.getERC20TokenLiveStatusString(contract);
+		    		erc20token.status = newstatus;
+		    		
 		    		refresh = true;
 		    		
 		    		// save token

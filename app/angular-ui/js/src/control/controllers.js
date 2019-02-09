@@ -404,13 +404,24 @@ class Controllers {
 			
 			ethereumnodeaccess.web3_getNodeInfo(function(err, info) {
 				console.log('returning from web3_getNodeInfo');
+				
+				if (info) {
+					nodeinfo.islistening = info.islistening;
+					nodeinfo.networkid = info.networkid;
+					nodeinfo.peercount = info.peercount;
+					nodeinfo.issyncing = info.issyncing;
+					nodeinfo.currentblock = info.currentblock;
+					nodeinfo.highestblock = info.highestblock;
+				}
+				else {
+					nodeinfo.islistening = global.t('not available');
+					nodeinfo.networkid = global.t('not available');
+					nodeinfo.peercount = global.t('not available');
+					nodeinfo.issyncing = global.t('not available');
+					nodeinfo.currentblock = global.t('not available');
+					nodeinfo.highestblock = global.t('not available');
+				}
 
-				nodeinfo.islistening = info.islistening;
-				nodeinfo.networkid = info.networkid;
-				nodeinfo.peercount = info.peercount;
-				nodeinfo.issyncing = info.issyncing;
-				nodeinfo.currentblock = info.currentblock;
-				nodeinfo.highestblock = info.highestblock;
 				
 				// tell scope a value has changed
 				$scope.$apply();
