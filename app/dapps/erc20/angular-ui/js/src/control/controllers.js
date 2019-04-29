@@ -115,34 +115,50 @@ var DAPPControllers = class {
 		
 	}
 	
-	registerStates($stateProvider) {
-		var global = this.global;
+	getStates() {
+		var statearray = [];
 		
-		$stateProvider
-	    .state('home.erc20tokens', {url: '/erc20tokens', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20tokens.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('ERC20 Tokens') }})
-	    .state('home.erc20tokens.create', {url: '/create', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-create.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Create') }})
-	    .state('home.erc20tokens.import', {url: '/import', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-import.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Import') }})
-	    .state('home.erc20tokens.modify', {url: '/modify/:uuid', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-modify.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Modify') }})
-	    .state('home.erc20tokens.deploy', {url: '/deploy/:uuid', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-deploy.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Publish') }})
-	    .state('home.erc20tokens.view', {url: '/view/:uuid', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-view.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('View') }})
-	    .state('home.erc20tokens.view.account', {url: '/account/:address', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-account-view.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Account') }})
-	    .state('home.erc20tokens.view.account.transfer', {url: '/transfer', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-account-tranfer.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Transfer') }})
-	    .state('home.erc20tokens.view.account.burn', {url: '/burn', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-account-burn.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Burn') }})
-	    .state('home.erc20tokens.view.account.approve', {url: '/approve', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-account-approve.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Approve') }})
-	    .state('home.erc20tokens.view.account.approveandcall', {url: '/approveandcall', views: {'main@': {templateUrl: './dapps/erc20/angular-ui/templates/erc20token-account-approveandcall.html', controller: "PageRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Approve') }})
-	    .state('home.erc20tokens.delete', {url: '/delete/:uuid', views: {'main@': {controller: "ERC20TokenRemoveRequestHandler",}},
-	        ncyBreadcrumb: { label: global.t('Delete') }})
+		var global = this.global;
+		var app = this.app;
+		
+		statearray
+	    .push(['home.erc20tokens', {url: '/erc20tokens', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20tokens.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('ERC20 Tokens') }}]);
+		statearray
+	    .push(['home.erc20tokens.create', {url: '/create', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-create.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Create') }}]);
+		statearray
+	    .push(['home.erc20tokens.import', {url: '/import', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-import.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Import') }}]);
+		statearray
+	    .push(['home.erc20tokens.modify', {url: '/modify/:uuid', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-modify.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Modify') }}]);
+		statearray
+	    .push(['home.erc20tokens.deploy', {url: '/deploy/:uuid', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-deploy.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Publish') }}]);
+		statearray
+	    .push(['home.erc20tokens.view', {url: '/view/:uuid', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-view.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('View') }}]);
+		statearray
+	    .push(['home.erc20tokens.view.account', {url: '/account/:address', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-account-view.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Account') }}]);
+		statearray
+	    .push(['home.erc20tokens.view.account.transfer', {url: '/transfer', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-account-tranfer.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Transfer') }}]);
+		statearray
+	    .push(['home.erc20tokens.view.account.burn', {url: '/burn', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-account-burn.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Burn') }}]);
+		statearray
+	    .push(['home.erc20tokens.view.account.approve', {url: '/approve', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-account-approve.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Approve') }}]);
+		statearray
+	    .push(['home.erc20tokens.view.account.approveandcall', {url: '/approveandcall', views: {'main@': {templateUrl: app.getHtmlUrl('./dapps/erc20/angular-ui/templates/erc20token-account-approveandcall.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Approve') }}]);
+		statearray
+	    .push(['home.erc20tokens.delete', {url: '/delete/:uuid', views: {'main@': {controller: "ERC20TokenRemoveRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Delete') }}]);
+		
+		return statearray;
 	}
 	
 	//
@@ -339,10 +355,14 @@ var DAPPControllers = class {
 
 		
 		if (contract.isLocalOnly() == false) {
-			writename(contract, erc20token);
-			writesymbol(contract, erc20token);
-			writedecimals(contract, erc20token);
-			writetotalsupply(contract, erc20token);
+			contract.checkStatus(function(err, res) {
+				// check status first to avoid calling methods
+				// for 'not found' contracts
+				writename(contract, erc20token);
+				writesymbol(contract, erc20token);
+				writedecimals(contract, erc20token);
+				writetotalsupply(contract, erc20token);
+			});
 		}
 		
 		// for local and on chain
@@ -402,7 +422,7 @@ var DAPPControllers = class {
 		var chainerc20tokenarray = erc20tokenmodule.getChainERC20Tokens(session, false);
 		
 		if (chainerc20tokenarray) {
-			chainerc20tokens = this._getViewERC20TokensArray($scope, views, chainerc20tokenarray)
+			chainerc20tokens = this._getViewERC20TokensArray($scope, views, chainerc20tokenarray);
 		}
 		
 		$scope.chainerc20tokens = chainerc20tokens;
@@ -934,6 +954,9 @@ var DAPPControllers = class {
 			erc20token.index = erc20tokencontract.getContractIndex();
 			erc20token.uuid = erc20tokencontract.getUUID();
 		}
+		
+		// fill account list
+		this._getAccountArrays($scope, session);
 		
 		// prepare wallet part
 		var mvcmodule = global.getModuleObject('mvc');

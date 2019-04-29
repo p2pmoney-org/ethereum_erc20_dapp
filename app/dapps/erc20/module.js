@@ -26,6 +26,8 @@ var Module = class {
 		var erc20controllers = new this.ERC20AngularControllers(global);
 		dappsmodule.pushAngularController(erc20controllers);
 		
+		this.controllers = erc20controllers;
+		
 		this.isready = true;
 	}
 	
@@ -33,21 +35,40 @@ var Module = class {
 	loadModule(parentscriptloader, callback) {
 		console.log('loadModule called for module ' + this.name);
 
-		if (this.isloading)
+		if (this.isready) {
+			if (callback)
+				callback(null, this);
+			
 			return;
+		}
+
+		if (this.isloading) {
+			var error = 'calling loadModule while still loading for module ' + this.name;
+			console.log('error: ' + error);
+			
+			if (callback)
+				callback(error, null);
+			
+			return;
+		}
 			
 		this.isloading = true;
 
 		var self = this;
 		var global = this.global;
+		var bootstrapobject = global.getBootstrapObject();
 
 		// erc20 ui
 		var modulescriptloader = global.getScriptLoader('erc20dapploader', parentscriptloader);
 		
 		var moduleroot = './dapps/erc20';
 
-		modulescriptloader.push_script( moduleroot + '/angular-ui/js/src/control/controllers.js');
-		modulescriptloader.push_script( moduleroot + '/angular-ui/js/src/view/views.js');
+		var mvcui = bootstrapobject.getMvcUI();
+		
+		if (mvcui == 'angularjs-1.x') {
+			modulescriptloader.push_script( moduleroot + '/angular-ui/js/src/control/controllers.js');
+			modulescriptloader.push_script( moduleroot + '/angular-ui/js/src/view/views.js');
+		}
 		
 		
 		modulescriptloader.load_scripts(function() { self.init(); if (callback) callback(null, self); });
@@ -77,12 +98,25 @@ var Module = class {
 		
 		// erc20 module
 		dappsmodelsloader.push_script( moduleroot + '/includes/module.js', function() {
+			// load module if initialization has finished
+			if (global.isReady())
 			global.loadModule('erc20', dappsmodelsloader);
 		 });
 		
 	}
 	
 	// functions
+	getControllersObject() {
+		if (this.controllers)
+			return this.controllers;
+		
+		var global = this.global;
+		this.controllers = new this.Controllers(global);
+		
+		return this.controllers;
+	}
+	
+
 }
 
 GlobalClass.getGlobalObject().registerModuleObject(new Module());

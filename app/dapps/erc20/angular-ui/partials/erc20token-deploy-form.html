@@ -7,7 +7,8 @@
 	
 	<span id="walletused-span" class="form-from-span">
 		<label for="walletused">{{'Wallet used:' | transl}}</label>
-		<input type="text" class="form-walletused-input" name="walletused" ng-model="walletused.text" required>
+		<input type="text" class="form-walletused-input" name="walletused" ng-model="walletused.text" required><br>
+ 		<select class="form-from-select" ng-model="selectedfrom" ng-change="handleFromChange()"><option ng-repeat="account in fromaccounts" ng-value="account.uuid">{{account.description}}</option></select>
  	</span>
 	
  	</div>

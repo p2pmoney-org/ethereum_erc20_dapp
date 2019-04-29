@@ -22,8 +22,22 @@ var Module = class {
 	loadModule(parentscriptloader, callback) {
 		console.log('loadModule called for module ' + this.name);
 
-		if (this.isloading)
+		if (this.isready) {
+			if (callback)
+				callback(null, this);
+			
 			return;
+		}
+
+		if (this.isloading) {
+			var error = 'calling loadModule while still loading for module ' + this.name;
+			console.log('error: ' + error);
+			
+			if (callback)
+				callback(error, null);
+			
+			return;
+		}
 			
 		this.isloading = true;
 
@@ -76,7 +90,8 @@ var Module = class {
 		
 		var contracts = commonmodule.getContractsObject();
 		
-		// register PublicNoticeBook in the contracts global object
+		// register TokenERC20 in the contracts global object
+		// (could be transfered to preFinalizeGlobalScopeInit_hook if necessary)
 		contracts.registerContractClass('TokenERC20', this.ERC20Token);
 		
 		// force refresh of list
