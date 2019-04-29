@@ -10,6 +10,9 @@ var ERC20TokenContractInterface = class {
 		this.finalized_init = null;
 		
 		this.contractinstance = null;
+		
+		var global = session.getGlobalObject();
+		this.ethnodemodule = global.getModuleObject('ethnode');
 	}
 	
 	getAddress() {
@@ -24,14 +27,21 @@ var ERC20TokenContractInterface = class {
 		if (this.contractinstance)
 			return this.contractinstance;
 		
-		this.contractinstance = this.session.getContractInstance(this.address, './contracts/TokenERC20.json');
+		var session = this.session;
+		var global = session.getGlobalObject();
+		var ethnodemodule = global.getModuleObject('ethnode');
+		
+		this.contractinstance = ethnodemodule.getContractInstance(this.address, './contracts/TokenERC20.json');
 		
 		return this.contractinstance;
 	}
 	
 	validateTransactionExecution(payingaccount, gas, gasPrice, callback) {
+		var session = this.session;
+		var ethnodemodule = this.ethnodemodule;
+
 		// we check the account is unlocked
-		if (payingaccount.isLocked())
+		if (ethnodemodule.isAccountLocked(payingaccount))
 			throw 'account ' + payingaccount.getAddress() + ' is locked, unable to initiate transaction';
 		
 		return true;

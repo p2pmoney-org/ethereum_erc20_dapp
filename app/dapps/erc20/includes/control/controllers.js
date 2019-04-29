@@ -23,8 +23,9 @@ var ModuleControllers = class {
 		var module = this.module;
 		var global = module.global;
 		var session = global.getModuleObject('common').getSessionObject();
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = session.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject();
 		
 		
 		var contract = contracts.createBlankContractObject('TokenERC20');
@@ -57,8 +58,9 @@ var ModuleControllers = class {
 		var module = this.module;
 		var global = module.global;
 		var session = global.getModuleObject('common').getSessionObject();
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = session.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject();
 		
 		
 		contract.setAddress(address);
@@ -82,8 +84,9 @@ var ModuleControllers = class {
 		
 		var commonmodule = global.getModuleObject('common');
 		var session = commonmodule.getSessionObject();
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = session.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject();
 
 		contracts.removeContractObject(contract);
 	}
@@ -110,8 +113,9 @@ var ModuleControllers = class {
 		var module = this.module;
 		var global = module.global;
 		var session = global.getModuleObject('common').getSessionObject();
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = session.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject();
 		
 		
 		var contract = contracts.getContractObjectFromUUID(contractuuid);
@@ -130,9 +134,10 @@ var ModuleControllers = class {
 		
 		var commoncontrollers = commonmodule.getControllersObject();
 
+		var ethnodemodule = global.getModuleObject('ethnode');
 
-		var gaslimit = commonmodule.getDefaultGasLimit();
-		var gasPrice = commonmodule.getDefaultGasPrice();
+		var gaslimit = ethnodemodule.getDefaultGasLimit();
+		var gasPrice = ethnodemodule.getDefaultGasPrice();
 		
 		values['gaslimit'] = gaslimit;
 		values['gasprice'] = gasPrice;
@@ -148,11 +153,11 @@ var ModuleControllers = class {
 			else {
 				if (commonmodule.useWalletAccount()) {
 					// do we pay everything from a single wallet
-					walletaddress = commonmodule.getWalletAccountAddress();
+					walletaddress = ethnodemodule.getWalletAccountAddress();
 				}
 				else {
 					console.log('not using wallet account');
-					console.log('wallet address is ' + commonmodule.getWalletAccountAddress());
+					console.log('wallet address is ' + ethnodemodule.getWalletAccountAddress());
 				}
 			}*/
 			
@@ -180,19 +185,22 @@ var ModuleControllers = class {
 	writebalance(wallet, contract, account, divbalance) {
 		console.log('spawning write of getBalance');
 		var self = this;
+		var global = this.module.global;
+		
+		var commonmodule = global.getModuleObject('common');
+		var commoncontrollers = commonmodule.getControllersObject();
+
+		var ethnodemodule = global.getModuleObject('ethnode');
+		var ethnodecontrollers = ethnodemodule.getControllersObject();
 		
 		var innerhtml = ''; // to avoid mvc-controller writing default wallet in-between our promises
 		
 		divbalance.currentwalletaddress = wallet.getAddress();
 
-		var res = wallet.getChainBalance(function(err, res) {
+		var res = ethnodemodule.getChainAccountBalance(wallet, function(err, res) {
 			if (!err) {
-				var global = self.module.global;
-				
-				var commonmodule = global.getModuleObject('common');
-				var commoncontrollers = commonmodule.getControllersObject();
 
-				var balancetext = commoncontrollers.getEtherStringFromWei(res);
+				var balancetext = ethnodecontrollers.getEtherStringFromWei(res);
 				
 				console.log('writebalance ether balance is ' + balancetext);
 				innerhtml = global.t('The account') + ' ' + wallet.getAddress() + ' ' + global.t('has') + ' ' + balancetext + ' ' + global.t('Ether');
@@ -240,8 +248,9 @@ var ModuleControllers = class {
 		
 		var commonmodule = global.getModuleObject('common');
 		var session = commonmodule.getSessionObject();
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = session.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject();
 		
 		var contractindex = contract.getContractIndex();
 		var contractuuid = contract.getUUID();
@@ -250,7 +259,7 @@ var ModuleControllers = class {
 			// insert
 			contracts.addContractObject(contract);
 			
-			session.saveContractObjects(contracts, function(err, res) {
+			ethnodemodule.saveContractObjects(contracts, function(err, res) {
 				if (callback)
 					callback(err, contracts);
 			});
@@ -278,10 +287,11 @@ var ModuleControllers = class {
 		
 		var commonmodule = global.getModuleObject('common');
 		var session = commonmodule.getSessionObject();
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = session.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject();
 
-		session.saveContractObjects(contracts, function(err, res) {
+		ethnodemodule.saveContractObjects(contracts, function(err, res) {
 			console.log('saveERC20Tokens returning from save');
 			if (callback)
 				callback(err, contracts);

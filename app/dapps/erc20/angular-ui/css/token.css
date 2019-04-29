@@ -3,14 +3,6 @@
 /***********************/
 
 
-.form-walletpassword-span label {
-  display: none;
-}
-
-.form-walletpassword-span input {
-  display: none;
-}
-
 .form-from-select {
   width: 300px;
 }

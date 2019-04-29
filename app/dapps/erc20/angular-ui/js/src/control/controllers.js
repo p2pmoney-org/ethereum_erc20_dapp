@@ -600,6 +600,9 @@ var DAPPControllers = class {
 
 		var session = commonmodule.getSessionObject();
 
+		var ethnodemodule = global.getModuleObject('ethnode');
+		var ethnodecontrollers = ethnodemodule.getControllersObject();
+
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -650,12 +653,12 @@ var DAPPControllers = class {
 						
 						// write ether balance for this account
 						var writeetherbalance = function(accountposition, account) {
-							account.getChainBalance(function(err, res) {
+							ethnodemodule.getChainAccountBalance(account, function(err, res) {
 								if (err) {
 									accountposition['ether_balance'] = global.t('error');
 								}
 								else {
-									var etherbalance = commoncontrollers.getEtherStringFromWei(res);
+									var etherbalance = ethnodecontrollers.getEtherStringFromWei(res);
 									accountposition['ether_balance'] = etherbalance + ' ETH';
 								}
 								
@@ -1020,7 +1023,9 @@ var DAPPControllers = class {
 			
 			
 			var commonmodule = global.getModuleObject('common');
-			var contracts = commonmodule.getContractsObject();
+			var ethnodemodule = global.getModuleObject('ethnode');
+
+			var contracts = ethnodemodule.getContractsObject();
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1034,7 +1039,7 @@ var DAPPControllers = class {
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				payingaccount.unlock(password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.deploy(payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1050,6 +1055,9 @@ var DAPPControllers = class {
 								app.setMessage('error deploying contract ' + err);
 							}
 								
+							// relock account
+							ethnodemodule.lockAccount(payingaccount);
+
 							// save erc20token
 							erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
 								self.getAngularControllers().gotoStatePage('home.erc20tokens');
@@ -1062,7 +1070,6 @@ var DAPPControllers = class {
 					catch(e) {
 						app.setMessage("Error: " + e);
 					}
-					
 
 					app.refreshDisplay();
 				});
@@ -1307,7 +1314,9 @@ var DAPPControllers = class {
 			
 			
 			var commonmodule = global.getModuleObject('common');
-			var contracts = commonmodule.getContractsObject();
+			var ethnodemodule = global.getModuleObject('ethnode');
+
+			var contracts = ethnodemodule.getContractsObject();
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1323,7 +1332,7 @@ var DAPPControllers = class {
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				payingaccount.unlock(password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					console.log('paying account ' + wallet + ' is now unlocked');
 					try {
@@ -1339,6 +1348,11 @@ var DAPPControllers = class {
 								
 								app.setMessage("transfer encountered an error: " + err);
 							}
+							
+							// relock account
+							ethnodemodule.lockAccount(payingaccount);
+
+							app.refreshDisplay();
 								
 						});
 						
@@ -1348,11 +1362,9 @@ var DAPPControllers = class {
 					catch(e) {
 						app.setMessage("Error: " + e);
 					}
-					
 
 					app.refreshDisplay();
 				});
-				
 			}
 		}
 
@@ -1468,7 +1480,9 @@ var DAPPControllers = class {
 			
 			
 			var commonmodule = global.getModuleObject('common');
-			var contracts = commonmodule.getContractsObject();
+			var ethnodemodule = global.getModuleObject('ethnode');
+
+			var contracts = ethnodemodule.getContractsObject();
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1483,7 +1497,7 @@ var DAPPControllers = class {
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				payingaccount.unlock(password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.burn(fromaccount, tokenamount, payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1498,7 +1512,12 @@ var DAPPControllers = class {
 								
 								app.setMessage("burn encountered an error: " + err);
 							}
+							
+							// relock account
+							ethnodemodule.lockAccount(payingaccount);
 								
+							app.refreshDisplay();
+
 						});
 						
 						app.setMessage("token burn created a pending transaction");
@@ -1507,7 +1526,6 @@ var DAPPControllers = class {
 					catch(e) {
 						app.setMessage("Error: " + e);
 					}
-					
 
 					app.refreshDisplay();
 				});
@@ -1628,7 +1646,9 @@ var DAPPControllers = class {
 			
 			
 			var commonmodule = global.getModuleObject('common');
-			var contracts = commonmodule.getContractsObject();
+			var ethnodemodule = global.getModuleObject('ethnode');
+
+			var contracts = ethnodemodule.getContractsObject();
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1643,7 +1663,7 @@ var DAPPControllers = class {
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				payingaccount.unlock(password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.approve(toaccount, tokenamount, payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1658,6 +1678,11 @@ var DAPPControllers = class {
 								
 								app.setMessage("approve encountered an error: " + err);
 							}
+							
+							// relock account
+							ethnodemodule.lockAccount(payingaccount);
+							
+							app.refreshDisplay();
 								
 						});
 						
@@ -1667,7 +1692,6 @@ var DAPPControllers = class {
 					catch(e) {
 						app.setMessage("Error: " + e);
 					}
-					
 
 					app.refreshDisplay();
 				});
@@ -1785,7 +1809,9 @@ var DAPPControllers = class {
 			
 			
 			var commonmodule = global.getModuleObject('common');
-			var contracts = commonmodule.getContractsObject();
+			var ethnodemodule = global.getModuleObject('ethnode');
+
+			var contracts = ethnodemodule.getContractsObject();
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1801,7 +1827,7 @@ var DAPPControllers = class {
 				var extraData = null;
 				
 				// unlock account
-				payingaccount.unlock(password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.approveAndCall(toaccount, tokenamount, extraData, payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1817,6 +1843,11 @@ var DAPPControllers = class {
 								app.setMessage("approve and call encountered an error: " + err);
 							}
 								
+							// relock account
+							ethnodemodule.lockAccount(payingaccount);
+							
+							app.refreshDisplay();
+
 						});
 						
 						app.setMessage("token approve and call created a pending transaction");
@@ -1825,7 +1856,6 @@ var DAPPControllers = class {
 					catch(e) {
 						app.setMessage("Error: " + e);
 					}
-					
 
 					app.refreshDisplay();
 				});

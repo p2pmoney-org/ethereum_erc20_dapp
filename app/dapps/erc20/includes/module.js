@@ -87,15 +87,16 @@ var Module = class {
 		var global = this.global;
 
 		var commonmodule = this.global.getModuleObject('common');
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = commonmodule.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject();
 		
 		// register TokenERC20 in the contracts global object
 		// (could be transfered to preFinalizeGlobalScopeInit_hook if necessary)
 		contracts.registerContractClass('TokenERC20', this.ERC20Token);
 		
 		// force refresh of list
-		commonmodule.getContractsObject(true);
+		ethnodemodule.getContractsObject(true);
 
 		result.push({module: 'erc20', handled: true});
 		
@@ -163,8 +164,9 @@ var Module = class {
 		var self = this;
 		
 		var commonmodule = global.getModuleObject('common');
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = commonmodule.getContractsObject(bForceRefresh, function(err, contracts) {
+		var contracts = ethnodemodule.getContractsObject(bForceRefresh, function(err, contracts) {
 			if (callback) {
 				var array = self._filterContracts(contracts);
 				
@@ -182,8 +184,9 @@ var Module = class {
 		var self = this;
 		
 		var commonmodule = global.getModuleObject('common');
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = commonmodule.getContractsObject(bForceRefresh, function(err, contracts) {
+		var contracts = ethnodemodule.getContractsObject(bForceRefresh, function(err, contracts) {
 			if (callback) {
 				var array = self._filterLocalContracts(contracts);
 				
@@ -199,8 +202,9 @@ var Module = class {
 	getChainERC20Tokens(session, bForceRefresh) {
 		var global = this.global;
 		var commonmodule = global.getModuleObject('common');
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = commonmodule.getContractsObject(bForceRefresh);
+		var contracts = ethnodemodule.getContractsObject(bForceRefresh);
 		
 		var array = [];
 		

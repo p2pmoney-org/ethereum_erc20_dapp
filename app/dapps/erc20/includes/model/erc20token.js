@@ -28,8 +28,9 @@ var ERC20Token = class {
 		// Contracts class
 		var global = session.getGlobalObject();
 		var commonmodule = global.getModuleObject('common');
+		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		this.Contracts = commonmodule.Contracts;
+		this.Contracts = ethnodemodule.Contracts;
 		
 		this.savedstatus = this.Contracts.STATUS_LOCAL;
 		
