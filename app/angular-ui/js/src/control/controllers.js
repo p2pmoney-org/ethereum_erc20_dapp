@@ -141,6 +141,10 @@ class Controllers {
 			return controllers.getLoginLink();
 		});
 		
+		angular_app.directive('reloadAppLink', function () {
+			return controllers.getReloadAppLink();
+		});
+		
 		angular_app.directive('datetime', function () {
 			return controllers.getDateTime();
 		});
@@ -288,6 +292,17 @@ class Controllers {
 		app.refreshDisplay();
 	}
 	
+	_forceAppReload() {
+		// use setTimeout to let page jump complete
+		setTimeout(function() {
+			location.reload(true);
+		  }, 100);
+	}
+	
+	reloadApp() {
+		this._forceAppReload();
+	}
+	
 	// specific to angular
 	gotoStatePage(pagestate, params) {
 		console.log("Controllers.gotoStatePage called for: " + pagestate);
@@ -322,7 +337,7 @@ class Controllers {
 		console.log("Controllers.handlePageRequest called with location: " + JSON.stringify($location));
 		  
 		$scope.message = "your location is " + $location.hash();
-		  
+		
 		var global = this.global;
 		var session = global.getModuleObject('common').getSessionObject();
 		console.log('is anonymous: ' + (session.isAnonymous() ? 'true' : 'false'));
@@ -1038,7 +1053,7 @@ class Controllers {
 		
 		this.gotoHome();
 		
-		location.reload(true);
+		this.reloadApp();
 	}
 	
 	_logout() {
@@ -1701,6 +1716,21 @@ class Controllers {
 		return {
 	        restrict: 'E',
 	        template: loginwidget
+	    }	
+	}
+	
+	getReloadAppLink(){  
+		console.log("Controllers.getReloadAppLink called");
+		
+		var global = this.global;
+		var views = global.getModuleObject('mvc').getViewsObject();
+		
+
+		var reloadwidget = views.getReloadAppWidget();
+		
+		return {
+	        restrict: 'E',
+	        template: reloadwidget
 	    }	
 	}
 	
