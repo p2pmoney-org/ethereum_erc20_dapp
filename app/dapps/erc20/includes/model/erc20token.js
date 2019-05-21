@@ -354,10 +354,14 @@ var ERC20Token = class {
 	
 	checkStatus(callback) {
 		var Contracts = this.Contracts;
-		var chaintestfunction = (this.getChainSymbol).bind(this);
+		var chaintestfunction = (this.isOnChain).bind(this);
 		var contractinstance = this.getContractInterface().getContractInstance();
 		
 		return Contracts.checkStatus(this, chaintestfunction, contractinstance, callback);
+	}
+	
+	isOnChain(callback) {
+		return this.getChainTotalSupply(callback);
 	}
 	
 	
