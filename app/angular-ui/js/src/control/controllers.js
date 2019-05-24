@@ -65,6 +65,11 @@ class Controllers {
 			controllers.prepareVersionInfoView($scope);
 		}]);
 
+		// load info
+		angular_app.controller("LoadInfoViewCtrl",  ['$scope', function ($scope) {
+			controllers.prepareLoadInfoView($scope);
+		}]);
+
 		// node info
 		angular_app.controller("NodeInfoViewCtrl",  ['$scope', function ($scope) {
 			controllers.prepareNodeInfoView($scope);
@@ -471,6 +476,48 @@ class Controllers {
 		
 		// append the to the current array
 		versioninfos.push(...allversioninfos);
+		
+	}
+	
+	prepareLoadInfoView($scope) {
+		console.log("Controllers.prepareLoadInfoView called");
+		
+		var global = this.global;
+		var Constants = window.Constants;
+		
+		var loadinfos = [];
+		
+		var lifecyclearray = Constants.get('lifecycle');
+		
+		var eventarray = [];
+		
+		if (Array.isArray(lifecyclearray) === false) {
+			if (lifecyclearray) {
+				eventarray.push(lifecyclearray);
+			}
+		}
+		else {
+			eventarray.push(...lifecyclearray);
+		}
+		
+		
+		// push now event
+		eventarray.push({eventname: 'now', time: Date.now()})
+		
+		// sort descending order
+		eventarray.sort(function(a,b) {return (b.time - a.time);});
+
+		for (var i = 0; i < eventarray.length; i++) {
+			var event = eventarray[i];
+			var loadinfo = {};
+			
+			loadinfo.label = global.t(event.eventname);
+			loadinfo.value = global.formatDate(new Date(event.time), 'YYYY-mm-dd HH:MM:SS');;
+			
+			loadinfos.push(loadinfo);
+		}
+		
+		$scope.loadinfos = loadinfos;
 		
 	}
 	

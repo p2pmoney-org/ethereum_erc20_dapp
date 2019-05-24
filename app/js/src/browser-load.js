@@ -5,7 +5,9 @@ var rootscriptloader = ScriptLoader.getRootScriptLoader();
 var globalscriptloader = rootscriptloader.getChildLoader('globalloader');
 
 globalscriptloader.push_script('./js/src/config.js');
-globalscriptloader.push_script('./js/src/constants.js');
+globalscriptloader.push_script('./js/src/constants.js', function() {
+	Constants.push('lifecycle', {eventname: 'app start', time: Date.now()});
+});
 
 globalscriptloader.push_script('./includes/modules/common/global.js');
 
@@ -109,6 +111,8 @@ rootscriptloader.registerEventListener('on_dapps_module_load_end', function(even
 					appscriptloader.load_scripts(function() {
 						// signal end of mvc module
 						rootscriptloader.signalEvent('on_mvc_module_load_end');
+						
+						Constants.push('lifecycle', {eventname: 'app ready', time: Date.now()});
 					});
 					
 				});
