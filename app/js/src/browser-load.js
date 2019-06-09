@@ -92,36 +92,40 @@ modulescriptloader.load_scripts(function () {
 
 //mvc
 rootscriptloader.registerEventListener('on_dapps_module_load_end', function(eventname) {
-	var mvcui = bootstrapobject.getMvcUI();
-	
-	if (mvcui == 'angularjs-1.x') {
-		var mvcscriptloader = dappsscriptloader.getChildLoader('mvcloader');
+	if (window.dapp_mvc_no_load !== true) {
+		var mvcui = bootstrapobject.getMvcUI();
+		
+		if (mvcui == 'angularjs-1.x') {
+			var mvcscriptloader = dappsscriptloader.getChildLoader('mvcloader');
 
-		mvcscriptloader.push_script('./angular-ui/js/src/module.js', 
-			function() {
-				var global = GlobalClass.getGlobalObject();	
-				
-				var allmodulesscriptloader = global.loadModule('mvc', modulescriptloader, function() {
-					// and finally loading the app
-					var appscriptloader = allmodulesscriptloader.getChildLoader('apploader');
+			mvcscriptloader.push_script('./angular-ui/js/src/module.js', 
+				function() {
+					var global = GlobalClass.getGlobalObject();	
 					
-					appscriptloader.push_script('./angular-ui/js/app.js');
-
-					//perform load
-					appscriptloader.load_scripts(function() {
-						// signal end of mvc module
-						rootscriptloader.signalEvent('on_mvc_module_load_end');
+					var allmodulesscriptloader = global.loadModule('mvc', modulescriptloader, function() {
+						// and finally loading the app
+						var appscriptloader = allmodulesscriptloader.getChildLoader('apploader');
 						
-						Constants.push('lifecycle', {eventname: 'app ready', time: Date.now()});
+						appscriptloader.push_script('./angular-ui/js/app.js');
+
+						//perform load
+						appscriptloader.load_scripts(function() {
+							// signal end of mvc module
+							rootscriptloader.signalEvent('on_mvc_module_load_end');
+							
+							Constants.push('lifecycle', {eventname: 'app ready', time: Date.now()});
+						});
+						
 					});
-					
-				});
-		});
+			});
 
 
-		//perform load
-		mvcscriptloader.load_scripts();
+			//perform load
+			mvcscriptloader.load_scripts();
+		}
+		
 	}
+	
 });
 
 
