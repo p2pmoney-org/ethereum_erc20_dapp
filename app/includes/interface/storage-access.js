@@ -191,7 +191,7 @@ class StorageAccess {
 
 		var promise = new Promise(function (resolve, reject) {
 			try {
-				var keys = ['accounts'];
+				var keys = ['common', 'accounts'];
 				
 				self.readUserJson(keys, function(err, res) {
 					
@@ -267,8 +267,12 @@ class StorageAccess {
 				commonmodule.insertLocalJsonLeaf(session, keys, null, null, json);
 			}
 			
-			if (callback)
-				callback(null, json);
+			/*if (callback)
+				callback(null, json);*/
+			
+			// save
+			var useraccountjson = commonmodule.readLocalJson(session, keys); // from cache, since no refresh
+			commonmodule.saveLocalJson(session, keys, useraccountjson, callback);
 			
 			return resolve(json);
 		});
@@ -321,8 +325,12 @@ class StorageAccess {
 				throw 'could not find account with uuid ' + uuid;
 			}
 			
-			if (callback)
-				callback(null, jsonleaf);
+			/*if (callback)
+				callback(null, jsonleaf);*/
+			
+			// save
+			var useraccountjson = commonmodule.readLocalJson(session, keys); // from cache, since no refresh
+			commonmodule.saveLocalJson(session, keys, useraccountjson, callback);
 			
 			return resolve(jsonleaf);
 		});

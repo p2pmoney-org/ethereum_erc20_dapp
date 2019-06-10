@@ -639,7 +639,8 @@ class Controllers {
 		
 		var cryptokeys = [];
 		
-		var cryptokeyarray = session.getSessionCryptoKeyObjects(true, function(err, keyarray) {
+		//var cryptokeyarray = 
+		session.getSessionCryptoKeyObjects(true, function(err, keyarray) {
 			if (keyarray) {
 				// empty array
 				while(cryptokeys.length > 0) { cryptokeys.pop();}
@@ -666,7 +667,7 @@ class Controllers {
 			self._apply($scope);
 		});
 		
-		if (cryptokeyarray) {
+		/*if (cryptokeyarray) {
 			for (var i = 0; i < cryptokeyarray.length; i++) {
 				var cryptokeyobj = cryptokeyarray[i];
 				
@@ -682,7 +683,7 @@ class Controllers {
 					cryptokeys.push(cryptokey);
 				}
 			}
-		}
+		}*/
 		
 		$scope.cryptokeys = cryptokeys;
 	}
@@ -740,7 +741,11 @@ class Controllers {
 								}
 								
 								// tell scope a value has changed
-								$scope.$apply();
+								//$scope.$apply();
+								
+								// putting $apply in a deferred call to avoid determining if callback is called
+								// from a promise or direct continuation of the code
+								self._apply($scope);
 							});
 						};
 						
