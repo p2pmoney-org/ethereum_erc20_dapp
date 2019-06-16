@@ -68,8 +68,8 @@ var Module = class {
 	
 	// objects
 	getEthereumNodeAccessInstance(session) {
-		if (this.ethereum_node_access_instance)
-			return this.ethereum_node_access_instance;
+		if (session.ethereum_node_access_instance)
+			return session.ethereum_node_access_instance;
 		
 		console.log('instantiating EthereumNodeAccess');
 		
@@ -83,14 +83,14 @@ var Module = class {
 		var ret = global.invokeHooks('getEthereumNodeAccessInstance_hook', result, inputparams);
 		
 		if (ret && result[0]) {
-			this.ethereum_node_access_instance = result[0];
+			session.ethereum_node_access_instance = result[0];
 		}
 		else {
-			this.ethereum_node_access_instance = new EthereumNodeAccess(session);
+			session.ethereum_node_access_instance = new EthereumNodeAccess(session);
 		}
 
 		
-		return this.ethereum_node_access_instance;
+		return session.ethereum_node_access_instance;
 	}
 	
 	getArtifactProxyObject(artifactuuid, contractname, artifactpath, abi, bytecode) {

@@ -57,8 +57,8 @@ var Module = class {
 	
 	// objects
 	getStorageAccessInstance(session) {
-		if (this.storage_access_instance)
-			return this.storage_access_instance;
+		if (session.storage_access_instance)
+			return session.storage_access_instance;
 		
 		console.log('instantiating StorageAccess');
 		
@@ -72,14 +72,14 @@ var Module = class {
 		var ret = global.invokeHooks('getStorageAccessInstance_hook', result, inputparams);
 		
 		if (ret && result[0]) {
-			this.storage_access_instance = result[0];
+			session.storage_access_instance = result[0];
 		}
 		else {
-			this.storage_access_instance = new StorageAccess(session);
+			session.storage_access_instance = new StorageAccess(session);
 		}
 
 		
-		return this.storage_access_instance;
+		return session.storage_access_instance;
 	}
 	
 	// utilitites
