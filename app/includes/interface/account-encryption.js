@@ -74,6 +74,7 @@ var Module = class {
 		var result = [];
 		var inputparams = [];
 		
+		inputparams.push(this);
 		inputparams.push(session);
 		inputparams.push(account);
 		
