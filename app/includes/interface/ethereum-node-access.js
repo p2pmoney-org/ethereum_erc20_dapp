@@ -93,8 +93,6 @@ var Module = class {
 			session.ethereum_node_access_instance = new EthereumNodeAccess(session);
 		}
 		
-		session.ethereum_node_access_instance = result[0];
-
 		
 		return session.ethereum_node_access_instance;
 	}
