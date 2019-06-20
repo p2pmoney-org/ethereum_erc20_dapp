@@ -78,6 +78,9 @@ var Module = class {
 		inputparams.push(session);
 		inputparams.push(cryptokey);
 		
+		result[0] = new CryptoKeyEncryption(session, cryptokey);
+		
+		// call hook to let modify or replace instance
 		var ret = global.invokeHooks('getCryptoKeyEncryptionInstance_hook', result, inputparams);
 		
 		if (ret && result[0]) {

@@ -81,6 +81,9 @@ var Module = class {
 		inputparams.push(this);
 		inputparams.push(session);
 		
+		result[0]= new EthereumNodeAccess(session);
+		
+		// call hook to let modify or replace instance
 		var ret = global.invokeHooks('getEthereumNodeAccessInstance_hook', result, inputparams);
 		
 		if (ret && result[0]) {
@@ -89,6 +92,8 @@ var Module = class {
 		else {
 			session.ethereum_node_access_instance = new EthereumNodeAccess(session);
 		}
+		
+		session.ethereum_node_access_instance = result[0];
 
 		
 		return session.ethereum_node_access_instance;

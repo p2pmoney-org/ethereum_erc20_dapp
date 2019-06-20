@@ -70,6 +70,9 @@ var Module = class {
 		inputparams.push(this);
 		inputparams.push(session);
 		
+		result[0] = new StorageAccess(session);
+		
+		// call hook to let modify or replace instance
 		var ret = global.invokeHooks('getStorageAccessInstance_hook', result, inputparams);
 		
 		if (ret && result[0]) {
