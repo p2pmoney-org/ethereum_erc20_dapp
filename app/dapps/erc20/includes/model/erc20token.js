@@ -637,9 +637,13 @@ var ERC20Token = class {
 
 }
 
-
 if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 	GlobalClass.registerModuleClass('erc20', 'ERC20Token', ERC20Token);
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('erc20', 'ERC20Token', ERC20Token);
+}
 else
 	module.exports = ERC20Token; // we are in node js
 

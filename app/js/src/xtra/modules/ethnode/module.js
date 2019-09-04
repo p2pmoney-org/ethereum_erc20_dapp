@@ -39,7 +39,7 @@ var Module = class {
 		
 		
 		// web3
-		var web3providerurl = this.global.globalscope.Config.getWeb3ProviderUrl();
+		var web3providerurl = this.global.globalscope.simplestore.Config.getWeb3ProviderUrl();
 		
 		this.setWeb3ProviderUrl(web3providerurl);
 		
@@ -170,25 +170,33 @@ var Module = class {
 	//
 	
 	// web 3
-	getWeb3ProviderUrl() {
-		return this.web3providerurl;
+	getWeb3ProviderUrl(session) {
+		var web3providerurl = this.web3providerurl; // return Config value as default
+		
+		if ((session) && (session.web3providerurl))
+			web3providerurl = this.web3providerurl; // return session's value
+		
+		return web3providerurl;
 	}
 	
-	setWeb3ProviderUrl(url) {
-		this.web3providerurl = url;
+	setWeb3ProviderUrl(url, session) {
+		if (session) {
+			// set for this session only
+			session.web3providerurl = url;
+		}
+		else {
+			this.web3providerurl = url;
+		}
 	}
-	/*getWeb3ProviderUrl() {
-	return this.global.globalscope.Config.getWeb3ProviderUrl();
-	}*/
 	
 	getDefaultGasLimit() {
-		var defaultlimit = this.global.globalscope.Config.getDefaultGasLimit();
+		var defaultlimit = this.global.globalscope.simplestore.Config.getDefaultGasLimit();
 		
 		return defaultlimit;
 	}
 	
 	getDefaultGasPrice() {
-		var defaultprice = this.global.globalscope.Config.getDefaultGasPrice();
+		var defaultprice = this.global.globalscope.simplestore.Config.getDefaultGasPrice();
 		
 		return defaultprice;
 	}
@@ -208,7 +216,7 @@ var Module = class {
 		if ((typeof this.needtounlockaccounts !== 'undefined') && (this.needtounlockaccounts != null))
 			return this.needtounlockaccounts;
 		
-		var needtounlockaccounts = this.global.globalscope.Config.needToUnlockAccounts();
+		var needtounlockaccounts = this.global.globalscope.simplestore.Config.needToUnlockAccounts();
 		
 		this.needtounlockaccounts = needtounlockaccounts;
 		
@@ -344,7 +352,7 @@ var Module = class {
 	
 	// wallet
 	useWalletAccount() {
-		var wallletaccount = this.global.globalscope.Config.getWalletAccountAddress();
+		var wallletaccount = this.global.globalscope.simplestore.Config.getWalletAccountAddress();
 		
 		if (wallletaccount)
 			return true;
@@ -356,7 +364,7 @@ var Module = class {
 		if ((typeof this.walletaccountaddress !== 'undefined') && (this.walletaccountaddress != null))
 			return this.walletaccountaddress;
 		
-		var walletaccountaddress = this.global.globalscope.Config.getWalletAccountAddress();
+		var walletaccountaddress = this.global.globalscope.simplestore.Config.getWalletAccountAddress();
 		
 		this.walletaccountaddress = walletaccountaddress;
 
@@ -369,7 +377,7 @@ var Module = class {
 	}
 	
 	useWalletAccountChallenge() {
-		var walletaccountchallenge = this.global.globalscope.Config.useWalletAccountChallenge();
+		var walletaccountchallenge = this.global.globalscope.simplestore.Config.useWalletAccountChallenge();
 		
 		return walletaccountchallenge;
 	}
@@ -514,7 +522,20 @@ var Module = class {
 	}
 }
 
+if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 GlobalClass.getGlobalObject().registerModuleObject(new Module());
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+}
+
 
 // dependencies
+if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 GlobalClass.getGlobalObject().registerModuleDepency('ethnode', 'common');
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleDepency('ethnode', 'common');
+}

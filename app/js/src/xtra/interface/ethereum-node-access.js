@@ -34,6 +34,7 @@ var Module = class {
 
 		var self = this;
 		var global = this.global;
+		var ScriptLoader = window.simplestore.ScriptLoader;
 		
 		var modulescriptloader = global.getScriptLoader('ethereumnodeaccessmoduleloader', parentscriptloader);
 
@@ -114,10 +115,18 @@ var Module = class {
 	//
 	getWeb3Class(session) {
 		if ( typeof window !== 'undefined' && window ) {
-			return Web3;
+			if ( typeof window.Web3 !== 'undefined' && window.Web3 ) 
+			return window.Web3;
+			else {
+				if (window.simplestore.Web3)
+				return window.simplestore.Web3;
+				else
+				throw 'Web3 should be available in window.simplestore.Web3';
+			}
 		}
 		else {
-			return require('web3');
+			throw 'nodejs not implemented';
+			//return require('web3');
 		}
 	}
 	
@@ -127,7 +136,7 @@ var Module = class {
 		var global = this.global;
 		var ethnodemodule = global.getModuleObject('ethnode');
 
-		var web3providerurl = ethnodemodule.getWeb3ProviderUrl();
+		var web3providerurl = ethnodemodule.getWeb3ProviderUrl(session);
 		var web3Provider = new Web3.providers.HttpProvider(web3providerurl);
 
 		return web3Provider;
@@ -152,14 +161,15 @@ var Module = class {
 			return window.ethereumjs;
 		}
 		else {
-			var ethereumjs;
+			throw 'nodejs not implemented';
+			/*var ethereumjs;
 			
 			ethereumjs = require('ethereum.js');
 			ethereumjs.Util = require('ethereumjs-util');
 			ethereumjs.Wallet = require('ethereumjs-wallet');
 			ethereumjs.tx = require('ethereumjs-tx');
 
-			return ethereumjs;
+			return ethereumjs;*/
 		}
 	}
 
@@ -716,23 +726,6 @@ class EthereumNodeAccess {
 		return this.web3instance;
 	}
 	
-	/*_getEthereumJsClass() {
-		if ( typeof window !== 'undefined' && window ) {
-			return window.ethereumjs;
-		}
-		else {
-			var ethereumjs;
-			
-			ethereumjs = require('ethereum.js');
-			ethereumjs.Util = require('ethereumjs-util');
-			ethereumjs.Wallet = require('ethereumjs-wallet');
-			ethereumjs.tx = require('ethereumjs-tx');
-
-			return ethereumjs;
-		}
-	}*/
-	
-
 	
 	
 	// node
@@ -2149,7 +2142,8 @@ class EthereumNodeAccess {
 			return TruffleContract;
 		}
 		else {
-			return require('truffle-contract');
+			throw 'nodejs not implemented';
+			//return require('truffle-contract');
 		}
 	}
 	
@@ -2245,10 +2239,17 @@ class EthereumNodeAccess {
 }
 
 if ( typeof window !== 'undefined' && window ) // if we are in browser and not node js (e.g. truffle)
-window.EthereumNodeAccess = EthereumNodeAccess;
+window.simplestore.EthereumNodeAccess = EthereumNodeAccess;
 else
 module.exports = EthereumNodeAccess; // we are in node js
 
+if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 GlobalClass.getGlobalObject().registerModuleObject(new Module());
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+}
+
 
 

@@ -302,4 +302,10 @@ var ModuleControllers = class {
 
 }
 
+if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 GlobalClass.registerModuleClass('erc20', 'Controllers', ModuleControllers);
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('erc20', 'Controllers', ModuleControllers);
+}

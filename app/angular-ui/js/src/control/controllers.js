@@ -491,7 +491,7 @@ class Controllers {
 		console.log("Controllers.prepareLoadInfoView called");
 		
 		var global = this.global;
-		var Constants = window.Constants;
+		var Constants = window.simplestore.Constants;
 		
 		var loadinfos = [];
 		

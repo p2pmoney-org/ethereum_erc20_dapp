@@ -234,7 +234,18 @@ var Module = class {
 	}
 }
 
-GlobalClass.getGlobalObject().registerModuleObject(new Module());
+if ( typeof GlobalClass !== 'undefined' && GlobalClass ) {
+	GlobalClass.getGlobalObject().registerModuleObject(new Module());
 
-// dependencies
-GlobalClass.getGlobalObject().registerModuleDepency('erc20', 'erc20-dapp');
+	// dependencies
+	GlobalClass.getGlobalObject().registerModuleDepency('erc20', 'erc20-dapp');
+}
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+
+	// dependencies
+	_GlobalClass.getGlobalObject().registerModuleDepency('erc20', 'erc20-dapp');		
+}
+

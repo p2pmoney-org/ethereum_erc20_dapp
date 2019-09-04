@@ -39,5 +39,10 @@ var ERC20TokenLocalPersistor = class {
 
 if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 	GlobalClass.registerModuleClass('erc20', 'ERC20TokenLocalPersistor', ERC20TokenLocalPersistor);
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('erc20', 'ERC20TokenLocalPersistor', ERC20TokenLocalPersistor);
+}
 else
-	module.exports = StockLedgerLocalPersistor; // we are in node js
+	module.exports = ERC20TokenLocalPersistor; // we are in node js

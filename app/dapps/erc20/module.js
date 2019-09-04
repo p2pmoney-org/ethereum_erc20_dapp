@@ -23,10 +23,12 @@ var Module = class {
 		var dappsmodule = global.getModuleObject('dapps');
 		
 		// create controllers
-		var erc20controllers = new this.ERC20AngularControllers(global);
-		dappsmodule.pushAngularController(erc20controllers);
-		
-		this.controllers = erc20controllers;
+		if (this.ERC20AngularControllers) {
+			var erc20controllers = new this.ERC20AngularControllers(global);
+			dappsmodule.pushAngularController(erc20controllers);
+			
+			this.controllers = erc20controllers;
+		}
 		
 		this.isready = true;
 	}
@@ -119,7 +121,18 @@ var Module = class {
 
 }
 
-GlobalClass.getGlobalObject().registerModuleObject(new Module());
+if ( typeof GlobalClass !== 'undefined' && GlobalClass ) {
+	GlobalClass.getGlobalObject().registerModuleObject(new Module());
 
-// dependencies
-GlobalClass.getGlobalObject().registerModuleDepency('erc20-dapp', 'dapps');
+	// dependencies
+	GlobalClass.getGlobalObject().registerModuleDepency('erc20-dapp', 'dapps');
+}
+else if (typeof window !== 'undefined') {
+	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+
+	// dependencies
+	_GlobalClass.getGlobalObject().registerModuleDepency('erc20-dapp', 'dapps');		
+}
+
