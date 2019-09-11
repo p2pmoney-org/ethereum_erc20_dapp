@@ -27,6 +27,9 @@ var Module = class {
 		this.transactionmap = Object.create(null); // use a simple object to implement the map
 
 		// payer
+		this.defaultgaslimit = null;
+		this.defaultgasprice = null;
+		
 		this.walletaccountaddress = null;
 		this.needtounlockaccounts = null;
 		
@@ -171,43 +174,79 @@ var Module = class {
 	
 	// web 3
 	getWeb3ProviderUrl(session) {
-		var web3providerurl = this.web3providerurl; // return Config value as default
-		
 		if ((session) && (session.web3providerurl))
-			web3providerurl = this.web3providerurl; // return session's value
+			return session.web3providerurl; // return session's value
+		
+		var web3providerurl = this.web3providerurl; // return Config value as default
 		
 		return web3providerurl;
 	}
 	
 	setWeb3ProviderUrl(url, session) {
+		var global = this.global;
+
 		if (session) {
 			// set for this session only
 			session.web3providerurl = url;
+			var ethereumnodeaccessmodule = global.getModuleObject('ethereum-node-access');
+			
+			ethereumnodeaccessmodule.clearEthereumNodeAccessInstance(session);
 		}
 		else {
 			this.web3providerurl = url;
 		}
 	}
 	
-	getDefaultGasLimit() {
-		var defaultlimit = this.global.globalscope.simplestore.Config.getDefaultGasLimit();
+	getDefaultGasLimit(session) {
+		if (session && session.defaultgaslimit)
+			return session.defaultgaslimit;
 		
-		return defaultlimit;
+		if (this.defaultgaslimit)
+			return this.defaultgaslimit;
+		
+		this.defaultgaslimit = this.global.globalscope.simplestore.Config.getDefaultGasLimit();
+		
+		return this.defaultgaslimit;
 	}
 	
-	getDefaultGasPrice() {
-		var defaultprice = this.global.globalscope.simplestore.Config.getDefaultGasPrice();
+	setDefaultGasLimit(gaslimit, session) {
+		if (session) {
+			session.defaultgaslimit = gaslimit;
+		}
+		else {
+			this.defaultgaslimit = gaslimit;
+		}
+	}
+
+	
+	getDefaultGasPrice(session) {
+		if (session && session.defaultgasprice)
+			return session.defaultgasprice;
+			
+		if (this.defaultgasprice)
+			return this.defaultgasprice;
 		
-		return defaultprice;
+		this.defaultgasprice = this.global.globalscope.simplestore.Config.getDefaultGasPrice();
+		
+		return this.defaultgasprice;
+	}
+	
+	setDefaultGasPrice(gasprice, session) {
+		if (session) {
+			session.defaultgasprice = gasprice;
+		}
+		else {
+			this.defaultgasprice = gasprice;
+		}
 	}
 	
 	// instances of interfaces
-	getEthereumNodeAccessInstance() {
+	getEthereumNodeAccessInstance(session) {
 		var global = this.global;
-		var session = this.getSessionObject();
+		var sess = (session ? session : this.getSessionObject());
 		var ethereumnodeaccessmodule = global.getModuleObject('ethereum-node-access');
 		
-		return ethereumnodeaccessmodule.getEthereumNodeAccessInstance(session);
+		return ethereumnodeaccessmodule.getEthereumNodeAccessInstance(sess);
 	}
 	
 	
@@ -360,7 +399,10 @@ var Module = class {
 			return false;
 	}
 	
-	getWalletAccountAddress() {
+	getWalletAccountAddress(session) {
+		if (session && session.walletaccountaddress)
+			return session.walletaccountaddress;
+		
 		if ((typeof this.walletaccountaddress !== 'undefined') && (this.walletaccountaddress != null))
 			return this.walletaccountaddress;
 		
@@ -372,8 +414,13 @@ var Module = class {
 		return this.walletaccountaddress;
 	}
 	
-	setWalletAccountAddress(address) {
-		this.walletaccountaddress = address;
+	setWalletAccountAddress(address, session) {
+		if (session) {
+			session.walletaccountaddress = address;
+		}
+		else {
+			this.walletaccountaddress = address;
+		}
 	}
 	
 	useWalletAccountChallenge() {

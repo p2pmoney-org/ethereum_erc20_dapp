@@ -38,7 +38,8 @@ var Module = class {
 		
 		var modulescriptloader = global.getScriptLoader('ethereumnodeaccessmoduleloader', parentscriptloader);
 
-		var moduleroot = ScriptLoader.getDappdir() + './js/src/xtra/lib';
+		//var moduleroot = ScriptLoader.getDappdir() + './js/src/xtra/lib';
+		var moduleroot = './js/src/xtra/lib';
 
 		if (global.isInBrowser()) {
 			if (this.web3_version  == "1.0.x") {
@@ -98,6 +99,11 @@ var Module = class {
 		return session.ethereum_node_access_instance;
 	}
 	
+	clearEthereumNodeAccessInstance(session) {
+		session.ethereum_node_access_instance = null;
+	}
+
+	
 	getArtifactProxyObject(artifactuuid, contractname, artifactpath, abi, bytecode) {
 		return new ArtifactProxy(artifactuuid, contractname, artifactpath, abi, bytecode);
 	}
@@ -143,17 +149,20 @@ var Module = class {
 	}
 	
 	getWeb3Instance(session) {
-		if (this.web3instance)
-			return this.web3instance;
+		if (session && session.ethereum_node_access_instance && session.ethereum_node_access_instance.web3instance)
+			return session.ethereum_node_access_instance.web3instance;
 		
 		var Web3 = this.getWeb3Class();
 		var web3Provider = this.getWeb3Provider(session);
 		  
-		this.web3instance = new Web3(web3Provider);		
+		var web3instance = new Web3(web3Provider);		
 		
 		console.log("web3 instance created");
 		
-		return this.web3instance;
+		if (session && session.ethereum_node_access_instance)
+			session.ethereum_node_access_instance.web3instance = web3instance;
+		
+		return web3instance;
 	}
 	
 	getEthereumJsClass(session) {
@@ -704,6 +713,18 @@ class EthereumNodeAccess {
 		this.web3_version = ethereumnodeaccessmodule.web3_version;
 	}
 	
+	isReady(callback) {
+		var promise = new Promise(function (resolve, reject) {
+			
+			if (callback)
+				callback(null, true);
+			
+			resolve(true);
+		});
+		
+		return promise
+	}
+	
 	//
 	// Web3
 	//
@@ -729,6 +750,18 @@ class EthereumNodeAccess {
 	
 	
 	// node
+	web3_setProviderUrl(url, callback) {
+		this.web3instance = null;
+		
+		var Web3 = this.ethereumnodeaccessmodule.getWeb3Class();
+		var web3Provider = new Web3.providers.HttpProvider(url);
+		
+		this.web3instance = new Web3(web3Provider);
+		
+		if (callback)
+			callback(null, this.web3instance);
+	}
+	
 	web3_isSyncing(callback) {
 		var self = this
 		var session = this.session;

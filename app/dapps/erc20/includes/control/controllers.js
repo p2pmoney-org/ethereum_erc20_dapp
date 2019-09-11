@@ -136,8 +136,8 @@ var ModuleControllers = class {
 
 		var ethnodemodule = global.getModuleObject('ethnode');
 
-		var gaslimit = ethnodemodule.getDefaultGasLimit();
-		var gasPrice = ethnodemodule.getDefaultGasPrice();
+		var gaslimit = ethnodemodule.getDefaultGasLimit(session);
+		var gasPrice = ethnodemodule.getDefaultGasPrice(session);
 		
 		values['gaslimit'] = gaslimit;
 		values['gasprice'] = gasPrice;
@@ -163,7 +163,7 @@ var ModuleControllers = class {
 			
 			// erc20token.sol does not support "in name of" transactions
 			// we necessarily use fromaccount as wallet
-			walletaddress = fromaccount.getAddress();
+			walletaddress = (fromaccount ? fromaccount.getAddress() : null);
 			
 			if (walletaddress) {
 				

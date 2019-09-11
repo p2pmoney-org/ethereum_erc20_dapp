@@ -486,8 +486,21 @@ class ScriptLoader {
 						
 					}
 					
+					var source;
+					
+					if (file.startsWith('/')) {
+						source = ScriptLoader.dapp_dir + '.' + file;
+					}
+					else if (file.startsWith('./')) {
+						// './' means relative to dapp dir (not html page)
+						source = ScriptLoader.dapp_dir + file;
+					}
+					else {
+						source = file;
+					}
+					
 					var script  = document.createElement('script');
-					script.src  = ScriptLoader.dapp_dir + file;
+					script.src  = source;
 					script.type = 'text/javascript';
 					script.defer = true;
 
@@ -590,9 +603,9 @@ if ( typeof window !== 'undefined' && window ) { // if we are in browser and not
 	window.simplestore.Bootstrap = Bootstrap;
 	window.simplestore.ScriptLoader = ScriptLoader;
 	
+	var rootscriptloader = ScriptLoader.getRootScriptLoader();
 	
 	if ( (window.global_scope_no_load === undefined) || (window.global_scope_no_load === false)) {
-		var rootscriptloader = ScriptLoader.getRootScriptLoader();
 		var bootstraploader = rootscriptloader.getChildLoader('bootstrap');
 	
 		bootstraploader.push_script(ScriptLoader.__dirname() + '/constants.js');
@@ -602,10 +615,11 @@ if ( typeof window !== 'undefined' && window ) { // if we are in browser and not
 	
 	
 		bootstraploader.load_scripts(function() {
+			// signal end of bootstrap
+			rootscriptloader.signalEvent('on_bootstrap_load_end');
+						
 			if ((window.dapp_browser_no_load === undefined) 
 					|| (window.dapp_browser_no_load === false)){
-				
-				rootscriptloader.signalEvent('on_bootstrap_load_end');
 				
 				// load browser-load.js
 				//var browserload = ScriptLoader.getScriptLoader('bootstrap');
@@ -620,6 +634,7 @@ if ( typeof window !== 'undefined' && window ) { // if we are in browser and not
 			
 		});
 	}
+	
 }
 else
 module.exports = ScriptLoader; // we are in node js

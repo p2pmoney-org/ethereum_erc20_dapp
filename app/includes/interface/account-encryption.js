@@ -102,6 +102,18 @@ class AccountEncryption {
 		this.account = account;
 	}
 	
+	isReady(callback) {
+		var promise = new Promise(function (resolve, reject) {
+			
+			if (callback)
+				callback(null, true);
+			
+			resolve(true);
+		});
+		
+		return promise
+	}
+	
 	// encryption
 	getKeythereumClass() {
 		if ( typeof window !== 'undefined' && window ) {

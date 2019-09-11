@@ -149,6 +149,18 @@ class StorageAccess {
 		this.session = session;
 	}
 	
+	isReady(callback) {
+		var promise = new Promise(function (resolve, reject) {
+			
+			if (callback)
+				callback(null, true);
+			
+			resolve(true);
+		});
+		
+		return promise
+	}
+	
 	//
 	// Storage API
 	//
