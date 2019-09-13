@@ -77,7 +77,7 @@ var Transaction = class {
 		var session = this.session;
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		var promise = EthereumNodeAccess.web3_findTransaction(this.transactionuuid, function(err, res) {
 			
@@ -96,7 +96,7 @@ var Transaction = class {
 		var session = this.session;
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		
 		var promise = EthereumNodeAccess.web3_getTransaction(this.txhash, function(err, res) {
@@ -112,7 +112,7 @@ var Transaction = class {
 		var session = this.session;
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		
 		var promise = EthereumNodeAccess.web3_getTransactionReceipt(this.txhash, function(err, res) {

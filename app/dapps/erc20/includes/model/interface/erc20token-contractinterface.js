@@ -31,7 +31,7 @@ var ERC20TokenContractInterface = class {
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		this.contractinstance = ethnodemodule.getContractInstance(this.address, './contracts/TokenERC20.json');
+		this.contractinstance = ethnodemodule.getContractInstance(session, this.address, './contracts/TokenERC20.json');
 		
 		return this.contractinstance;
 	}
@@ -41,7 +41,7 @@ var ERC20TokenContractInterface = class {
 		var ethnodemodule = this.ethnodemodule;
 
 		// we check the account is unlocked
-		if (ethnodemodule.isAccountLocked(payingaccount))
+		if (ethnodemodule.isAccountLocked(session, payingaccount))
 			throw 'account ' + payingaccount.getAddress() + ' is locked, unable to initiate transaction';
 		
 		return true;

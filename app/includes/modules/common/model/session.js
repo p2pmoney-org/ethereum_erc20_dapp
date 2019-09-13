@@ -489,7 +489,7 @@ var Session = class {
 			var global = this.getGlobalObject();
 			var commonmodule = global.getModuleObject('common');
 
-			this.user = commonmodule.createBlankUserObject();
+			this.user = commonmodule.createBlankUserObject(this);
 			
 			this.user.setUserName(address);
 			this.user.setUserUUID(address);
@@ -599,7 +599,7 @@ var Session = class {
 			var rsapublickey = key['rsa_public_key'];
 			var description = key['description'];
 			
-			var account = commonmodule.createBlankAccountObject();
+			var account = commonmodule.createBlankAccountObject(this);
 			
 			account.setAccountUUID(keyuuid);
 			account.setDescription(description);

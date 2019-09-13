@@ -46,9 +46,9 @@ var ModuleControllers = class {
 				
 				if (divcue) {
 					// we display the balance in the div passed
-					var wallet = commonmodule.getAccountObject(walletaddress);
+					var wallet = commonmodule.getAccountObject(session, walletaddress);
 					
-					this.writebalance(wallet, divcue);
+					this.writebalance(session, wallet, divcue);
 				}
 			}
 		}
@@ -85,9 +85,9 @@ var ModuleControllers = class {
 				
 				if (divcue) {
 					// we display the balance in the div passed
-					var wallet = commonmodule.getAccountObject(walletaddress);
+					var wallet = commonmodule.getAccountObject(session, walletaddress);
 					
-					this.writebalance(wallet, divcue);
+					this.writebalance(session, wallet, divcue);
 				}
 			}
 		}
@@ -103,7 +103,7 @@ var ModuleControllers = class {
 		var commonmodule = global.getModuleObject('common');
 
 
-		ethnodemodule.getTransactionList(function(err, transactionarray) {
+		ethnodemodule.getTransactionList(session, function(err, transactionarray) {
 			var transaction = null;
 			
 			if (transactionarray) {
@@ -168,9 +168,9 @@ var ModuleControllers = class {
 				
 				if (divcue) {
 					// we display the balance in the div passed
-					var wallet = commonmodule.getAccountObject(walletaddress);
+					var wallet = commonmodule.getAccountObject(session, walletaddress);
 					
-					this.writebalance(wallet, divcue);
+					this.writebalance(session, wallet, divcue);
 				}
 			}
 		}
@@ -184,14 +184,14 @@ var ModuleControllers = class {
 		return ether.toFixed(decimal);
 	}
 	
-	writebalance(wallet, divbalance) {
+	writebalance(session, wallet, divbalance) {
 		console.log('spawning write of getBalance');
 		var self = this;
 		var ethnodemodule = this.module;
 		
 		divbalance.currentwalletaddress = wallet.getAddress();
 		
-		var res = ethnodemodule.getChainAccountBalance(wallet, function(err, res) {
+		var res = ethnodemodule.getChainAccountBalance(session, wallet, function(err, res) {
 			if (!err) {
 				if (divbalance.currentwalletaddress.toLowerCase()  == wallet.getAddress().toLowerCase()) {
 					// we write the balance, if indeed we are the current wallet selected for the div

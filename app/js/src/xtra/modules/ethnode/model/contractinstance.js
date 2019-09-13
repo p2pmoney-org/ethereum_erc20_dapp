@@ -206,7 +206,7 @@ var ContractInstance = class {
 		var self = this;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		var loadpromise = EthereumNodeAccess.truffle_loadArtifact(this.contractartifact, function(data) {
 			// Get the necessary contract artifact file and instantiate it with truffle-contract
 			var ContractInstanceArtifact = data;
@@ -255,7 +255,7 @@ var ContractInstance = class {
 		var session = this.session;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		var handleaccept = function (instance) {
 			console.log('handleaccept: truffle contract instantiation done for ' + self.address);
@@ -344,7 +344,7 @@ var ContractInstance = class {
 		var ethnodemodule = this.ethnodemodule;
 		
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		var loadpromise = EthereumNodeAccess.web3_loadArtifact(this.contractartifact, function(contract_artifact) {
 			return contract_artifact;
 		})
@@ -369,7 +369,7 @@ var ContractInstance = class {
 		var ethnodemodule = this.ethnodemodule;
 		
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		var abi = this.web3contract.getAbi();
 		var address = this.address;
@@ -439,7 +439,7 @@ var ContractInstance = class {
 		var ethnodemodule = this.ethnodemodule;
 
 		// we check the account is unlocked
-		if (ethnodemodule.isAccountLocked(payingaccount))
+		if (ethnodemodule.isAccountLocked(session, payingaccount))
 			throw 'account ' + payingaccount.getAddress() + ' is locked, unable to deploy contract';
 		
 		return true;
@@ -450,7 +450,7 @@ var ContractInstance = class {
 		var session = this.session;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 
 		var payingaccount = contracttransaction.getPayingAccount();
 		var gas = contracttransaction.getGas();
@@ -543,7 +543,7 @@ var ContractInstance = class {
 		var session = this.session;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 
 		var fromaddress = payingaccount.getAddress();
 		
@@ -630,7 +630,7 @@ var ContractInstance = class {
 		var session = this.session;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		var promise = this.activate(function (err, res) {
 			if ((!res) && (callback))
@@ -684,7 +684,7 @@ var ContractInstance = class {
 		var ethnodemodule = this.ethnodemodule;
 
 		// we check the account is unlocked
-		if (ethnodemodule.isAccountLocked(payingaccount))
+		if (ethnodemodule.isAccountLocked(session, payingaccount))
 			throw 'account ' + payingaccount.getAddress() + ' is locked, unable to send transaction';
 		
 		return true;
@@ -695,7 +695,7 @@ var ContractInstance = class {
 		var session = this.session;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		var methodname = contracttransaction.getMethodName();
 		
@@ -786,7 +786,7 @@ var ContractInstance = class {
 		var session = this.session;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 
 		var fromaddress = payingaccount.getAddress();
 		
@@ -872,7 +872,7 @@ var ContractInstance = class {
 		var session = this.session;
 		var ethnodemodule = this.ethnodemodule;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 
 		var promise = EthereumNodeAccess.web3_findTransaction(transactionuuid)
 		.then(function(res) {

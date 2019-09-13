@@ -16,10 +16,10 @@ var Module = class {
 		//this.web3instance = null;
 		
 		// ethereum node access
-		this.ethereum_node_access_instance = null;
+		//this.ethereum_node_access_instance = null;
 		
 		// operating
-		this.web3instance = null;
+		//this.web3instance = null;
 		
 		this.controllers = null;
 		
@@ -140,19 +140,19 @@ var Module = class {
 		var session = params[0];
 		
 		// we flush the list of contracts
-		if (this.contracts) {
-			this.contracts.flushContractObjects();
+		if (session && (session.contracts)) {
+			session.contracts.flushContractObjects();
 		}	
 	}
 	
 
 	// session
-	getSessionObject() {
+	/*getSessionObject() {
 		var global = this.global;
 		var commonmodule = global.getModuleObject('common');
 		
 		return commonmodule.getSessionObject();
-	}
+	}*/
 	
 
 	//
@@ -242,11 +242,13 @@ var Module = class {
 	
 	// instances of interfaces
 	getEthereumNodeAccessInstance(session) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = this.global;
-		var sess = (session ? session : this.getSessionObject());
 		var ethereumnodeaccessmodule = global.getModuleObject('ethereum-node-access');
 		
-		return ethereumnodeaccessmodule.getEthereumNodeAccessInstance(sess);
+		return ethereumnodeaccessmodule.getEthereumNodeAccessInstance(session);
 	}
 	
 	
@@ -266,8 +268,10 @@ var Module = class {
 		this.needtounlockaccounts = choice;
 	}
 	
-	unlockAccount(account, password, duration, callback) {
-		var session = this.getSessionObject();
+	unlockAccount(session, account, password, duration, callback) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
@@ -285,13 +289,15 @@ var Module = class {
 		console.log('Account.unlock called for ' + duration + ' seconds ');
 		
 		// call interface to unlock
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		return EthereumNodeAccess.web3_unlockAccount(account, password, duration, callback);
 	}
 	
-	lockAccount(account, callback) {
-		var session = this.getSessionObject();
+	lockAccount(session, account, callback) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
@@ -307,13 +313,15 @@ var Module = class {
 		account.lastunlock = null; // unix time
 		account.lastunlockduration = null;
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		return EthereumNodeAccess.web3_lockAccount(account, callback);
 	}
 	
-	isAccountLocked(account) {
-		var session = this.getSessionObject();
+	isAccountLocked(session, account) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
@@ -332,12 +340,14 @@ var Module = class {
 		}
 	}
 	
-	getAccountBalance(account) {
-		var session = this.getSessionObject();
+	getAccountBalance(session, account) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		var accountaddress = account.getAddress();
 		
@@ -345,22 +355,26 @@ var Module = class {
 	}
 	
 	// chain async
-	getChainAccountBalance(account, callback) {
-		var session = this.getSessionObject();
+	getChainAccountBalance(session, account, callback) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		var accountaddress = account.getAddress();
 
 		return EthereumNodeAccess.web3_getBalance(accountaddress, callback);
 	}
 	
-	transferAmount(fromaccount, toaccount, amount, gas, gasPrice, transactionuuid, callback) {
+	transferAmount(session, fromaccount, toaccount, amount, gas, gasPrice, transactionuuid, callback) {
 		console.log('Account.transferAmount called for amount ' + amount + ' to ' + (toaccount ? toaccount.getAddress() : null) + ' with transactionuuid ' + transactionuuid);
 		
-		var session = this.getSessionObject();
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = session.getGlobalObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
@@ -378,7 +392,7 @@ var Module = class {
 		ethereumtransaction.setTransactionUUID(transactionuuid);
 
 		
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 		
 		
 		return EthereumNodeAccess.web3_sendEthTransaction(ethereumtransaction, callback);
@@ -429,37 +443,44 @@ var Module = class {
 		return walletaccountchallenge;
 	}
 	
-	getWalletAccountObject() {
-		var address = this.getWalletAccountAddress();
+	getWalletAccountObject(session) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var address = this.getWalletAccountAddress(session);
 		
 		if (address) {
 			var global = this.global;
 			var commonmodule = global.getModuleObject('common');
 			
-			return commonmodule.getAccountObject(address);
+			return commonmodule.getAccountObject(session, address);
 		}
 	}
 
 	
 	// contracts
-	getContractsObject(bForceRefresh, callback) {
-		if ((this.contracts) && (!bForceRefresh) && (bForceRefresh != true)) {
+	getContractsObject(session, bForceRefresh, callback) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		if ((session.contracts) 
+				&& (!bForceRefresh) 
+				&& (bForceRefresh != true)) {
 			
 			if (callback)
-				callback(null, this.contracts);
+				callback(null, session.contracts);
 			
-			return this.contracts;
+			return session.contracts;
 		}
 		
 		var global = this.global;
-		var session = this.getSessionObject();
 		var self = this;
 		
-		if (this.contracts) {
-			this.contracts.flushContractObjects();
+		if (session.contracts) {
+			session.contracts.flushContractObjects();
 		}
 		else {
-			this.contracts = new this.Contracts(session);
+			session.contracts = new this.Contracts(session);
 		}
 		
 		// invoke hook to build processing chain
@@ -471,14 +492,14 @@ var Module = class {
 		
 		result.get = function(err, jsonarray) {
 			if (!err) {
-				self.contracts.initContractObjects(jsonarray);
+				session.contracts.initContractObjects(jsonarray);
 				
 				if (callback)
-					callback(null, self.contracts);
+					callback(null, session.contracts);
 			}
 			else {
 				if (callback)
-					callback(err, self.contracts);
+					callback(err, session.contracts);
 			}
 		};
 
@@ -495,17 +516,19 @@ var Module = class {
 		result.get(null, jsonarray);
 
 		
-		return this.contracts;
+		return session.contracts;
 	}
 	
-	saveContractObjects(contracts, callback) {
+	saveContractObjects(session, contracts, callback) {
 		var json = contracts.getContractObjectsJson();
 		console.log("Session.saveContractObjects: contracts json is " + JSON.stringify(json));
 		
 		var global = this.global;
 		var self = this;
 		
-		var session = this.getSessionObject();
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		
 		var keys = ['common','contracts'];
 
@@ -515,29 +538,32 @@ var Module = class {
 			if (!err) {
 				// re-initialize contract list (that can have been refreshed from previous states)
 				// with the saved version
-				if (self.contracts) {
-					self.contracts.initContractObjects(jsonarray);
+				if (session.contracts) {
+					session.contracts.initContractObjects(jsonarray);
 				}
 			}
 			
 			if (callback)
-				callback(null, self.contracts);
+				callback(null, session.contracts);
 			
-			return self.contracts;
+			return session.contracts;
 		});
 	}
 
 	// contract instance
-	getContractInstance(contractaddress, contractartifact) {
-		var session = this.getSessionObject();
+	getContractInstance(session, contractaddress, contractartifact) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var contractinstance = new this.ContractInstance(session, contractaddress, contractartifact);
 		
 		return contractinstance;
 	}
 	
 	// transactions
-	getTransactionObject(transactionuuid) {
-		var session = this.getSessionObject();;
+	getTransactionObject(session, transactionuuid) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
 		
 		var transaction = new this.Transaction(session, transactionuuid);
 		
@@ -548,9 +574,11 @@ var Module = class {
 		return transaction;
 	}
 	
-	getTransactionList(callback) {
-		var session = this.getSessionObject();
-		var EthereumNodeAccess = this.getEthereumNodeAccessInstance();
+	getTransactionList(session, callback) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var EthereumNodeAccess = this.getEthereumNodeAccessInstance(session);
 		
 		return EthereumNodeAccess.web3_getTransactionList(callback);
 	}

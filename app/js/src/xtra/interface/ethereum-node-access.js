@@ -444,8 +444,8 @@ class EthereumTransaction {
 		
 		this.value = 0;
 		
-		this.gas = ethnodemodule.getDefaultGasLimit();
-		this.gasPrice = ethnodemodule.getDefaultGasPrice();
+		this.gas = ethnodemodule.getDefaultGasLimit(session);
+		this.gasPrice = ethnodemodule.getDefaultGasPrice(session);
 		
 		this.data = null;
 		
@@ -625,7 +625,7 @@ class EthereumTransaction {
 		var txjson = this.getTxJson();
 		
 		var ethereumnodeaccessmodule = this.ethereumnodeaccessmodule;
-		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance();
+		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
 
 		
 		if (fromaccount.canSignTransactions()) {
@@ -1385,7 +1385,7 @@ class EthereumNodeAccess {
 					
 					for (var i = 0; i < txarray.length; i++) {
 						var tx = txarray[i];
-						var transaction = ethnodemodule.getTransactionObject(tx['transactionuuid']);
+						var transaction = ethnodemodule.getTransactionObject(session, tx['transactionuuid']);
 						
 						transaction.setTransactionHash(tx['transactionHash']);
 						transaction.setFrom(tx['from']);

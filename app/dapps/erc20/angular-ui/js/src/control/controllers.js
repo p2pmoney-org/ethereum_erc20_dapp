@@ -17,6 +17,25 @@ var DAPPControllers = class {
 		return this.app;
 	}
 	
+	// default session (app level)
+	getCurrentSessionObject() {
+		return this.getAngularControllers().getCurrentSessionObject();
+	}
+	
+	setCurrentSessionObject(newsession) {
+		this.getAngularControllers().setCurrentSessionObject(newsession);
+	}
+	
+
+	// scope level
+	getSessionObject($scope) {
+		return this.getAngularControllers().getSessionObject($scope);
+	}
+	
+	setSessionObject($scope, session) {
+		this.getAngularControllers().setSessionObject($scope, session);
+	}
+	
 	getAngularControllers() {
 		var mvcmodule = this.global.getModuleObject('mvc');
 		
@@ -177,18 +196,18 @@ var DAPPControllers = class {
 	    var global = this.global;
 	    
 		var commonmodule = global.getModuleObject('common');
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 	    
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 		if (erc20tokencontract) {
 			if (confirm('Are you sure you want to remove "' + erc20tokencontract.getLocalName() + '"?')) {
-				erc20tokencontrollers.removeERC20TokenObject(erc20tokencontract);
+				erc20tokencontrollers.removeERC20TokenObject(session, erc20tokencontract);
 				
-				erc20tokencontrollers.saveERC20Tokens(function(err, res) {
+				erc20tokencontrollers.saveERC20Tokens(session, function(err, res) {
 					self.getAngularControllers().gotoStatePage('home.erc20tokens');
 				});
 			}
@@ -212,6 +231,7 @@ var DAPPControllers = class {
 	
 	_getViewERC20TokenArray($scope, views, contract) {
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		
 		var erc20token = [];
 		
@@ -277,7 +297,7 @@ var DAPPControllers = class {
 		    		
 		    		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		    		
-		    		erc20tokencontrollers.saveERC20TokenObject(contract);
+		    		erc20tokencontrollers.saveERC20TokenObject(session, contract);
 		    	}
 				
 				// tell scope a value has changed
@@ -397,7 +417,7 @@ var DAPPControllers = class {
 		var app = this.getAppObject();
 
 		var commonmodule = global.getModuleObject('common');
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		var views = this.erc20tokenviews;
 
@@ -451,12 +471,14 @@ var DAPPControllers = class {
 	    var contractuuid = $stateParams.uuid;
 
 	    var global = this.global;
+		var session = this.getSessionObject($scope);
+
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		var erc20tokenviews = this.erc20tokenviews;
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 		if (erc20tokencontract) {
 			$scope.erc20tokenindex = erc20tokencontract.getContractIndex();
@@ -598,7 +620,7 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 
 		var ethnodemodule = global.getModuleObject('ethnode');
 		var ethnodecontrollers = ethnodemodule.getControllersObject();
@@ -607,7 +629,7 @@ var DAPPControllers = class {
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 		var accountpositions = [];
 		
@@ -653,7 +675,7 @@ var DAPPControllers = class {
 						
 						// write ether balance for this account
 						var writeetherbalance = function(accountposition, account) {
-							ethnodemodule.getChainAccountBalance(account, function(err, res) {
+							ethnodemodule.getChainAccountBalance(session, account, function(err, res) {
 								if (err) {
 									accountposition['ether_balance'] = global.t('error');
 								}
@@ -716,16 +738,18 @@ var DAPPControllers = class {
 		
 		// call module controller
 		var global = this.global;
+		var session = this.getSessionObject($scope);
+
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
 		// create (local) erc20token for these values
-		var erc20token = erc20tokencontrollers.createERC20TokenObject(data);
+		var erc20token = erc20tokencontrollers.createERC20TokenObject(session, data);
 		
 		// save erc20token
 		var self = this;
-		erc20tokencontrollers.saveERC20TokenObject(erc20token, function(err, res) {
+		erc20tokencontrollers.saveERC20TokenObject(session, erc20token, function(err, res) {
 			self.getAngularControllers().gotoStatePage('home.erc20tokens');
 		});
 		
@@ -761,17 +785,18 @@ var DAPPControllers = class {
 		// call module controller
 		var self = this;
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var app = this.getAppObject();
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
 		// create (local) contract for these values
-		var contract = erc20tokencontrollers.createERC20TokenObject(data);
+		var contract = erc20tokencontrollers.createERC20TokenObject(session, data);
 		
 		if (contract) {
 			// save contract
-			erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
+			erc20tokencontrollers.saveERC20TokenObject(session, contract, function(err, res) {
 				// start a promise chain, to collect name, symbol,..
 				console.log("starting retrieving chain data");
 
@@ -824,7 +849,7 @@ var DAPPControllers = class {
 					app.setMessage("deployed contract completely retrieved");
 					
 					// save erc20token
-					return erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
+					return erc20tokencontrollers.saveERC20TokenObject(session, contract, function(err, res) {
 						self.getAngularControllers().gotoStatePage('home.erc20tokens');
 					});
 				});
@@ -847,11 +872,12 @@ var DAPPControllers = class {
 
 		// call module controller
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 
 		// filling fields
 		var erc20token = [];
@@ -906,19 +932,20 @@ var DAPPControllers = class {
 	    data['description'] = $scope.description.text;
 		
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
 		// get (local) erc20token 
-		var erc20token = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20token = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
-		erc20token = erc20tokencontrollers.modifyERC20TokenObject(erc20token, data);
+		erc20token = erc20tokencontrollers.modifyERC20TokenObject(session, erc20token, data);
 		
 		// save erc20token
 		var self = this;
 		
-		erc20tokencontrollers.saveERC20TokenObject(erc20token, function(err,res) {
+		erc20tokencontrollers.saveERC20TokenObject(session, erc20token, function(err,res) {
 			self.getAngularControllers().gotoStatePage('home.erc20tokens');
 		});
 		
@@ -938,12 +965,12 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 
 		// filling fields
@@ -978,6 +1005,7 @@ var DAPPControllers = class {
 			
 			params.push($scope);
 			params.push(erc20tokendeployform);
+			params.push(session);
 
 			var ret = global.invokeHooks('alterERC20TokenDeployForm_hook', result, params);
 			
@@ -998,6 +1026,7 @@ var DAPPControllers = class {
 		
 		var self = this;
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var app = this.getAppObject();
 		
 		// call hooks
@@ -1006,7 +1035,8 @@ var DAPPControllers = class {
 		var params = [];
 		
 		params.push($scope);
-
+		params.push(session);
+		
 		var ret = global.invokeHooks('handleERC20TokenDeploySubmit_hook', result, params);
 		
 		if (ret && result && result.length) {
@@ -1025,7 +1055,7 @@ var DAPPControllers = class {
 			var commonmodule = global.getModuleObject('common');
 			var ethnodemodule = global.getModuleObject('ethnode');
 
-			var contracts = ethnodemodule.getContractsObject();
+			var contracts = ethnodemodule.getContractsObject(session);
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1034,12 +1064,11 @@ var DAPPControllers = class {
 			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if ((contract) && (contract.isLocalOnly())) {
-				var session = commonmodule.getSessionObject();
 				
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(session, payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.deploy(payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1056,10 +1085,10 @@ var DAPPControllers = class {
 							}
 								
 							// relock account
-							ethnodemodule.lockAccount(payingaccount);
+							ethnodemodule.lockAccount(session, payingaccount);
 
 							// save erc20token
-							erc20tokencontrollers.saveERC20TokenObject(contract, function(err, res) {
+							erc20tokencontrollers.saveERC20TokenObject(session, contract, function(err, res) {
 								self.getAngularControllers().gotoStatePage('home.erc20tokens');
 							});
 						});
@@ -1089,7 +1118,7 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		var fromaccount = commoncontrollers.getSessionAccountObjectFromUUID(session, accountuuid)
 
@@ -1105,7 +1134,7 @@ var DAPPControllers = class {
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 			
-			var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+			var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 
 			var divcue = document.getElementsByClassName('div-form-cue')[0];
 			
@@ -1121,7 +1150,7 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		var account = commoncontrollers.getAccountObjectFromUUID(session, accountuuid)
 
@@ -1205,7 +1234,7 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		// fill account list
 		this._getAccountArrays($scope, session);
@@ -1230,7 +1259,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 
 		// filling fields
@@ -1265,6 +1294,7 @@ var DAPPControllers = class {
 			
 			params.push($scope);
 			params.push(erc20tokendeployform);
+			params.push(session);
 
 			var ret = global.invokeHooks('alterERC20TokenAccountTransferForm_hook', result, params);
 			
@@ -1284,6 +1314,7 @@ var DAPPControllers = class {
 		console.log("Controllers.handleERC20TokenAccountTransferSubmit called");
 		
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var app = this.getAppObject();
 		
 		// call hooks
@@ -1292,6 +1323,7 @@ var DAPPControllers = class {
 		var params = [];
 		
 		params.push($scope);
+		params.push(session);
 
 		var ret = global.invokeHooks('handleERC20TokenAccountTransferSubmit_hook', result, params);
 		
@@ -1316,7 +1348,7 @@ var DAPPControllers = class {
 			var commonmodule = global.getModuleObject('common');
 			var ethnodemodule = global.getModuleObject('ethnode');
 
-			var contracts = ethnodemodule.getContractsObject();
+			var contracts = ethnodemodule.getContractsObject(session);
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1325,14 +1357,13 @@ var DAPPControllers = class {
 			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
-				var session = commonmodule.getSessionObject();
 				
 				var fromaccount = session.getAccountObject(from);
 				var toaccount = session.getAccountObject(to);
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(session, payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					console.log('paying account ' + wallet + ' is now unlocked');
 					try {
@@ -1350,7 +1381,7 @@ var DAPPControllers = class {
 							}
 							
 							// relock account
-							ethnodemodule.lockAccount(payingaccount);
+							ethnodemodule.lockAccount(session, payingaccount);
 
 							app.refreshDisplay();
 								
@@ -1387,7 +1418,7 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		
 		// account
@@ -1397,7 +1428,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 
 		// filling fields
@@ -1432,6 +1463,7 @@ var DAPPControllers = class {
 			
 			params.push($scope);
 			params.push(erc20tokendeployform);
+			params.push(session);
 
 			var ret = global.invokeHooks('alterERC20TokenAccountBurnForm_hook', result, params);
 			
@@ -1451,6 +1483,7 @@ var DAPPControllers = class {
 		console.log("Controllers.handleERC20TokenAccountBurnSubmit called");
 		
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var app = this.getAppObject();
 		
 		// call hooks
@@ -1459,6 +1492,7 @@ var DAPPControllers = class {
 		var params = [];
 		
 		params.push($scope);
+		params.push(session);
 
 		var ret = global.invokeHooks('handleERC20TokenAccountBurnSubmit_hook', result, params);
 		
@@ -1482,7 +1516,7 @@ var DAPPControllers = class {
 			var commonmodule = global.getModuleObject('common');
 			var ethnodemodule = global.getModuleObject('ethnode');
 
-			var contracts = ethnodemodule.getContractsObject();
+			var contracts = ethnodemodule.getContractsObject(session);
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1491,13 +1525,12 @@ var DAPPControllers = class {
 			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
-				var session = commonmodule.getSessionObject();
 				
 				var fromaccount = session.getAccountObject(from);
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(session, payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.burn(fromaccount, tokenamount, payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1514,7 +1547,7 @@ var DAPPControllers = class {
 							}
 							
 							// relock account
-							ethnodemodule.lockAccount(payingaccount);
+							ethnodemodule.lockAccount(session, payingaccount);
 								
 							app.refreshDisplay();
 
@@ -1552,7 +1585,7 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		
 		// account
@@ -1562,7 +1595,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 
 		// filling fields
@@ -1597,6 +1630,7 @@ var DAPPControllers = class {
 			
 			params.push($scope);
 			params.push(erc20tokendeployform);
+			params.push(session);
 
 			var ret = global.invokeHooks('alterERC20TokenAccountApproveForm_hook', result, params);
 			
@@ -1616,6 +1650,7 @@ var DAPPControllers = class {
 		console.log("Controllers.handleERC20TokenAccountApproveSubmit called");
 		
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var app = this.getAppObject();
 		
 		// call hooks
@@ -1624,6 +1659,7 @@ var DAPPControllers = class {
 		var params = [];
 		
 		params.push($scope);
+		params.push(session);
 
 		var ret = global.invokeHooks('handleERC20TokenAccountApproveSubmit_hook', result, params);
 		
@@ -1648,7 +1684,7 @@ var DAPPControllers = class {
 			var commonmodule = global.getModuleObject('common');
 			var ethnodemodule = global.getModuleObject('ethnode');
 
-			var contracts = ethnodemodule.getContractsObject();
+			var contracts = ethnodemodule.getContractsObject(session);
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1657,13 +1693,12 @@ var DAPPControllers = class {
 			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
-				var session = commonmodule.getSessionObject();
 				
 				var toaccount = session.getAccountObject(to);
 				var payingaccount = session.getAccountObject(wallet);
 				
 				// unlock account
-				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(session, payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.approve(toaccount, tokenamount, payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1680,7 +1715,7 @@ var DAPPControllers = class {
 							}
 							
 							// relock account
-							ethnodemodule.lockAccount(payingaccount);
+							ethnodemodule.lockAccount(session, payingaccount);
 							
 							app.refreshDisplay();
 								
@@ -1716,7 +1751,7 @@ var DAPPControllers = class {
 		var commonmodule = global.getModuleObject('common');
 		var commoncontrollers = commonmodule.getControllersObject();
 
-		var session = commonmodule.getSessionObject();
+		var session = this.getSessionObject($scope);
 		
 		
 		// account
@@ -1726,7 +1761,7 @@ var DAPPControllers = class {
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
 		
-		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(contractuuid);
+		var erc20tokencontract = erc20tokencontrollers.getERC20TokenFromUUID(session, contractuuid);
 		
 
 		// filling fields
@@ -1761,6 +1796,7 @@ var DAPPControllers = class {
 			
 			params.push($scope);
 			params.push(erc20tokendeployform);
+			params.push(session);
 
 			var ret = global.invokeHooks('alterERC20TokenAccountApproveAndCallForm_hook', result, params);
 			
@@ -1780,6 +1816,7 @@ var DAPPControllers = class {
 		console.log("Controllers.handleERC20TokenAccountApproveAndCallSubmit called");
 		
 		var global = this.global;
+		var session = this.getSessionObject($scope);
 		var app = this.getAppObject();
 		
 		// call hooks
@@ -1788,6 +1825,7 @@ var DAPPControllers = class {
 		var params = [];
 		
 		params.push($scope);
+		params.push(session);
 
 		var ret = global.invokeHooks('handleERC20TokenAccountApproveAndCallSubmit_hook', result, params);
 		
@@ -1811,7 +1849,7 @@ var DAPPControllers = class {
 			var commonmodule = global.getModuleObject('common');
 			var ethnodemodule = global.getModuleObject('ethnode');
 
-			var contracts = ethnodemodule.getContractsObject();
+			var contracts = ethnodemodule.getContractsObject(session);
 			
 			var erc20tokenmodule = global.getModuleObject('erc20');
 			var erc20tokencontrollers = erc20tokenmodule.getControllersObject();
@@ -1820,14 +1858,13 @@ var DAPPControllers = class {
 			var contract = contracts.getContractObjectFromUUID(contractuuid);
 			
 			if (contract) {
-				var session = commonmodule.getSessionObject();
 				
 				var toaccount = session.getAccountObject(to);
 				var payingaccount = session.getAccountObject(wallet);
 				var extraData = null;
 				
 				// unlock account
-				ethnodemodule.unlockAccount(payingaccount, password, 300) // 300s, but we can relock the account
+				ethnodemodule.unlockAccount(session, payingaccount, password, 300) // 300s, but we can relock the account
 				.then(function(res) {
 					try {
 						contract.approveAndCall(toaccount, tokenamount, extraData, payingaccount, gaslimit, gasPrice, function (err, res) {
@@ -1844,7 +1881,7 @@ var DAPPControllers = class {
 							}
 								
 							// relock account
-							ethnodemodule.lockAccount(payingaccount);
+							ethnodemodule.lockAccount(session, payingaccount);
 							
 							app.refreshDisplay();
 

@@ -131,19 +131,21 @@ var Module = class {
 		return this.web3instance;
 	}*/
 	
-	getSessionObject() {
+	/*getSessionObject() {
 		var commonmodule = this.global.getModuleObject('common');
 
 		return commonmodule.getSessionObject();
-	}
+	}*/
 	
-	getEthereumNodeAccess() {
+	getEthereumNodeAccess(session) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		var global = this.global;
-		var session = this.getSessionObject();
 		
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		return ethnodemodule.getEthereumNodeAccessInstance();
+		return ethnodemodule.getEthereumNodeAccessInstance(session);
 		/*if (session)
 			return session.getEthereumNodeAccessInstance();*/
 	}

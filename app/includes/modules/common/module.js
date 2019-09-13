@@ -12,7 +12,7 @@ var Module = class {
 		this.controllers = null;
 		
 		// model
-		this.session = null; // current session
+		//this.session = null; // current session
 		
 		this.session_array = [];
 	}
@@ -119,7 +119,7 @@ var Module = class {
 		
 		var _keys = commonkeys.concat(keys);
 		
-		var localstorage = this.session.getLocalStorageObject();
+		var localstorage = session.getLocalStorageObject();
 		return localstorage.getLocalJsonLeaf(_keys, uuid, uuidfieldname);
 	}
 	
@@ -128,7 +128,7 @@ var Module = class {
 		
 		var _keys = commonkeys.concat(keys);
 
-		var localstorage = this.session.getLocalStorageObject();
+		var localstorage = session.getLocalStorageObject();
 		return localstorage.updateLocalJsonLeaf(_keys, uuid, json, uuidfieldname);
 	}
 	
@@ -137,7 +137,7 @@ var Module = class {
 		
 		var _keys = commonkeys.concat(keys);
 
-		var localstorage = this.session.getLocalStorageObject();
+		var localstorage = session.getLocalStorageObject();
 		return localstorage.insertLocalJsonLeaf(_keys, parentuuid, collectionname, json, uuidfieldname);
 	}
 	
@@ -155,33 +155,25 @@ var Module = class {
 	
 	// session
 	createBlankSessionObject() {
-		return new this.Session(this.global);
-	}
-	
-	getSessionObject() {
-		if (this.session)
-			return this.session;
-		
 		console.log('Creating Session Object')
 		
+		// making sure class properties are ok
 		this.Session.Config = this.global.globalscope.simplestore.Config;
 		
 		// libs
 		this.Session.AccountEncryption = this.global.globalscope.simplestore.AccountEncryption;
 		
 		// model classes
-		//this.Session.Contracts = this.Contracts;
-		//this.Session.ContractInstance = this.ContractInstance;
-		
 		this.Session.CryptoKey = this.CryptoKey;
 		this.Session.CryptoKeyMap = this.CryptoKeyMap;
 		
 		this.Session.Account = this.Account;
 		this.Session.AccountMap = this.AccountMap;
 		
-		//this.Session.Transaction = this.Transaction;
-		
-		this.session = new this.Session(this.global);
+
+		// creating object
+		var session = new this.Session(this.global);
+		var sessionuuid = session.getSessionUUID();
 		
 		
 		// calling creatingSession_hook
@@ -190,7 +182,7 @@ var Module = class {
 		var result = []; 
 		var inputparams = [];
 		
-		inputparams.push(this.session);
+		inputparams.push(session);
 		
 		var ret = global.invokeHooks('creatingSession_hook', result, inputparams);
 		
@@ -199,20 +191,26 @@ var Module = class {
 		}
 		
 		// put session in multi-session array
-		this.session_array.push(this.session);
+		this.session_array.push(session);
 
+		return session;
+	}
+	
+	/*getSessionObject() {
+		if (this.session)
+			return this.session;
+		
+		if (this.session_array.length) {
+			this.session = this.session_array[0];
+			
+			return this.session;
+		}
+
+		this.session = this.createBlankSessionObject();
+		
 		return this.session;
 	}
 	
-	resetSessionObject() {
-		if (this.session) {
-			// re-read config
-			this.session.setWalletAccountAddress(this.getWalletAccountAddress());
-			this.session.setNeedToUnlockAccounts(this.needToUnlockAccounts());
-		}
-	}
-	
-	// multi session management
 	setCurrentSessionObject(session) {
 		var newsessionuuid = session.getSessionUUID();
 		
@@ -224,10 +222,24 @@ var Module = class {
 		}
 		
 		this.session = session;
-	}
+	}*/
 	
+	
+	// multi session management
 	getSessionObjects() {
 		return this.session_array;
+	}
+	
+	resetSessionObjects() {
+		for (var i = 0; i < this.session_array.length;i ++) {
+			var session = this.session_array[i];
+			
+			if (session) {
+				// re-read config
+				session.setWalletAccountAddress(this.getWalletAccountAddress());
+				session.setNeedToUnlockAccounts(this.needToUnlockAccounts());
+			}
+		}
 	}
 	
 	findSessionObjectFromUUID(sessionuuid) {
@@ -240,41 +252,42 @@ var Module = class {
 	}
 	
 	// user
-	createBlankUserObject() {
-		var session = this.getSessionObject();
+	createBlankUserObject(session) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+		
 		
 		return new this.User(session);
 	}
 	
 	// contracts
-	/*getContractsObject(bForceRefresh, callback) {
-		var session = this.getSessionObject();
-		
-		return session.getContractsObject(bForceRefresh, callback);
-	}*/
 	
 	// crypto keys
-	getCryptoKeyObject(address) {
-		var session = this.getSessionObject();
+	getCryptoKeyObject(session, address) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
 		
 		return session.getCryptoKeyObject(address);
 	}
 	
-	createBlankCryptoKeyObject() {
-		var session = this.getSessionObject();
+	createBlankCryptoKeyObject(session) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
 		
 		return session.createBlankCryptoKeyObject();
 	}
 	
 	// accounts
-	getAccountObject(address) {
-		var session = this.getSessionObject();
+	getAccountObject(session, address) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
 		
 		return session.getAccountObject(address);
 	}
 	
-	createBlankAccountObject() {
-		var session = this.getSessionObject();
+	createBlankAccountObject(session) {
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
 		
 		return session.createBlankAccountObject();
 	}

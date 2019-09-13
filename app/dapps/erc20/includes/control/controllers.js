@@ -7,9 +7,12 @@ var ModuleControllers = class {
 	}
 	
 	// erc20 tokens
-	createERC20TokenObject(data) {
+	createERC20TokenObject(session, data) {
 		console.log("Controllers.createERC20TokenObject called");
 		
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+
 		var address = (data && data['address'] ? data['address'] : null);
 
 		var name = (data && data['name'] ? data['name'] : null);
@@ -22,10 +25,9 @@ var ModuleControllers = class {
 
 		var module = this.module;
 		var global = module.global;
-		var session = global.getModuleObject('common').getSessionObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = ethnodemodule.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject(session);
 		
 		
 		var contract = contracts.createBlankContractObject('TokenERC20');
@@ -42,9 +44,12 @@ var ModuleControllers = class {
 		return contract;
 	}
 	
-	modifyERC20TokenObject(contract, data) {
+	modifyERC20TokenObject(session, contract, data) {
 		console.log("Controllers.modifyERC20TokenObject called");
 		
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+
 		var address = (data && data['address'] ? data['address'] : null);
 
 		var name = (data && data['name'] ? data['name'] : null);
@@ -57,10 +62,9 @@ var ModuleControllers = class {
 
 		var module = this.module;
 		var global = module.global;
-		var session = global.getModuleObject('common').getSessionObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = ethnodemodule.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject(session);
 		
 		
 		contract.setAddress(address);
@@ -75,29 +79,33 @@ var ModuleControllers = class {
 		return contract;
 	}
 	
-	removeERC20TokenObject(contract) {
+	removeERC20TokenObject(session, contract) {
 		if (!contract)
 			return;
 		
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+
 		var module = this.module;
 		var global = module.global;
 		
 		var commonmodule = global.getModuleObject('common');
-		var session = commonmodule.getSessionObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = ethnodemodule.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject(session);
 
 		contracts.removeContractObject(contract);
 	}
 		
 
-	getERC20TokenFromKey(contractindex) {
+	getERC20TokenFromKey(session, contractindex) {
 		console.log("Controllers.getERC20TokenFromKey called with index: " + contractindex);
+
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
 
 		var module = this.module;
 		var global = module.global;
-		var session = global.getModuleObject('common').getSessionObject();
 		
 		var contracts = session.getContractsObject();
 		
@@ -107,15 +115,17 @@ var ModuleControllers = class {
 		return contract;
 	}
 	
-	getERC20TokenFromUUID(contractuuid) {
+	getERC20TokenFromUUID(session, contractuuid) {
 		console.log("Controllers.getERC20TokenFromUUID called with uuid: " + contractuuid);
+
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
 
 		var module = this.module;
 		var global = module.global;
-		var session = global.getModuleObject('common').getSessionObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = ethnodemodule.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject(session);
 		
 		
 		var contract = contracts.getContractObjectFromUUID(contractuuid);
@@ -147,20 +157,6 @@ var ModuleControllers = class {
 		if (session) {
 			var sessionaccount = session.getMainSessionAccountObject();
 			
-			/*if (sessionaccount) {
-				walletaddress = sessionaccount.getAddress();
-			}
-			else {
-				if (commonmodule.useWalletAccount()) {
-					// do we pay everything from a single wallet
-					walletaddress = ethnodemodule.getWalletAccountAddress();
-				}
-				else {
-					console.log('not using wallet account');
-					console.log('wallet address is ' + ethnodemodule.getWalletAccountAddress());
-				}
-			}*/
-			
 			// erc20token.sol does not support "in name of" transactions
 			// we necessarily use fromaccount as wallet
 			walletaddress = (fromaccount ? fromaccount.getAddress() : null);
@@ -173,7 +169,7 @@ var ModuleControllers = class {
 					// we display the balance in the div passed
 					var wallet = session.getAccountObject(walletaddress);
 					
-					this.writebalance(wallet, contract, fromaccount, divcue);
+					this.writebalance(session, wallet, contract, fromaccount, divcue);
 				}
 			}
 		}
@@ -182,7 +178,7 @@ var ModuleControllers = class {
 		return values;
 	}
 	
-	writebalance(wallet, contract, account, divbalance) {
+	writebalance(session, wallet, contract, account, divbalance) {
 		console.log('spawning write of getBalance');
 		var self = this;
 		var global = this.module.global;
@@ -197,7 +193,7 @@ var ModuleControllers = class {
 		
 		divbalance.currentwalletaddress = wallet.getAddress();
 
-		var res = ethnodemodule.getChainAccountBalance(wallet, function(err, res) {
+		var res = ethnodemodule.getChainAccountBalance(session, wallet, function(err, res) {
 			if (!err) {
 
 				var balancetext = ethnodecontrollers.getEtherStringFromWei(res);
@@ -237,41 +233,26 @@ var ModuleControllers = class {
 	}
 	
 	// asynchrone functions
-	saveERC20TokenObject(contract, callback) {
+	saveERC20TokenObject(session, contract, callback) {
 		if (!contract)
 			return;
 		
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+
 		console.log("Controllers.saveERC20TokenObject called for contract uuid " + contract.getUUID());
 
 		var module = this.module;
 		var global = module.global;
 		
 		var commonmodule = global.getModuleObject('common');
-		var session = commonmodule.getSessionObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = ethnodemodule.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject(session);
 		
 		var contractindex = contract.getContractIndex();
 		var contractuuid = contract.getUUID();
 		
-		/*if (!contracts.getContractObjectFromUUID(contractuuid)) {
-			// insert
-			contracts.addContractObject(contract);
-			
-			ethnodemodule.saveContractObjects(contracts, function(err, res) {
-				if (callback)
-					callback(err, contracts);
-			});
-		}
-		else {
-			// update
-			contract.saveLocalJson(function(err, res) {
-				if (callback)
-					callback(err, contracts);
-			});
-		}*/
-
 		contract.saveLocalJson(function(err, res) {
 			if (callback)
 				callback(err, contracts);
@@ -279,19 +260,21 @@ var ModuleControllers = class {
 		
 	}
 
-	saveERC20Tokens(callback) {
+	saveERC20Tokens(session, callback) {
 		console.log("Controllers.saveERC20Tokens called");
 		
+		if (session instanceof Session !== true)
+			throw 'must pass a session object as first parameter!';
+
 		var module = this.module;
 		var global = module.global;
 		
 		var commonmodule = global.getModuleObject('common');
-		var session = commonmodule.getSessionObject();
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
-		var contracts = ethnodemodule.getContractsObject();
+		var contracts = ethnodemodule.getContractsObject(session);
 
-		ethnodemodule.saveContractObjects(contracts, function(err, res) {
+		ethnodemodule.saveContractObjects(session, contracts, function(err, res) {
 			console.log('saveERC20Tokens returning from save');
 			if (callback)
 				callback(err, contracts);
