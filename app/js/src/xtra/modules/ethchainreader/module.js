@@ -198,20 +198,28 @@ var Module = class {
 	
 }
 
-if ( typeof GlobalClass !== 'undefined' && GlobalClass )
-GlobalClass.getGlobalObject().registerModuleObject(new Module());
+if ( typeof GlobalClass !== 'undefined' && GlobalClass ) {
+	GlobalClass.getGlobalObject().registerModuleObject(new Module());
+	
+	// dependencies
+	GlobalClass.getGlobalObject().registerModuleDepency('ethchainreader', 'common');
+}
 else if (typeof window !== 'undefined') {
 	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
 	
 	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
-}
-
-
-// dependencies
-if ( typeof GlobalClass !== 'undefined' && GlobalClass )
-GlobalClass.getGlobalObject().registerModuleDepency('ethchainreader', 'common');
-else if (typeof window !== 'undefined') {
-	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
 	
+	// dependencies
 	_GlobalClass.getGlobalObject().registerModuleDepency('ethchainreader', 'common');
 }
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+	
+	// dependencies
+	_GlobalClass.getGlobalObject().registerModuleDepency('ethchainreader', 'common');
+}
+
+

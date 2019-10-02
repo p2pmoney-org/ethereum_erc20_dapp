@@ -656,5 +656,9 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.registerModuleClass('erc20', 'ERC20TokenContractInterface', ERC20TokenContractInterface);
 }
-else
-	module.exports = ERC20TokenContractInterface; // we are in node js
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('erc20', 'ERC20TokenContractInterface', ERC20TokenContractInterface);
+}

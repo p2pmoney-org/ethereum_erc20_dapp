@@ -10,8 +10,14 @@ var ModuleControllers = class {
 	createERC20TokenObject(session, data) {
 		console.log("Controllers.createERC20TokenObject called");
 		
-		if (session instanceof Session !== true)
+		var module = this.module;
+		var global = module.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 
 		var address = (data && data['address'] ? data['address'] : null);
 
@@ -23,8 +29,6 @@ var ModuleControllers = class {
 		var description = (data && data['description'] ? data['description'] : null);
 
 
-		var module = this.module;
-		var global = module.global;
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		var contracts = ethnodemodule.getContractsObject(session);
@@ -47,8 +51,14 @@ var ModuleControllers = class {
 	modifyERC20TokenObject(session, contract, data) {
 		console.log("Controllers.modifyERC20TokenObject called");
 		
-		if (session instanceof Session !== true)
+		var module = this.module;
+		var global = module.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 
 		var address = (data && data['address'] ? data['address'] : null);
 
@@ -60,8 +70,6 @@ var ModuleControllers = class {
 		var description = (data && data['description'] ? data['description'] : null);
 
 
-		var module = this.module;
-		var global = module.global;
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		var contracts = ethnodemodule.getContractsObject(session);
@@ -83,11 +91,14 @@ var ModuleControllers = class {
 		if (!contract)
 			return;
 		
-		if (session instanceof Session !== true)
-			throw 'must pass a session object as first parameter!';
-
 		var module = this.module;
 		var global = module.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		var commonmodule = global.getModuleObject('common');
 		var ethnodemodule = global.getModuleObject('ethnode');
@@ -101,11 +112,14 @@ var ModuleControllers = class {
 	getERC20TokenFromKey(session, contractindex) {
 		console.log("Controllers.getERC20TokenFromKey called with index: " + contractindex);
 
-		if (session instanceof Session !== true)
-			throw 'must pass a session object as first parameter!';
-
 		var module = this.module;
 		var global = module.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		var contracts = session.getContractsObject();
 		
@@ -118,11 +132,15 @@ var ModuleControllers = class {
 	getERC20TokenFromUUID(session, contractuuid) {
 		console.log("Controllers.getERC20TokenFromUUID called with uuid: " + contractuuid);
 
-		if (session instanceof Session !== true)
-			throw 'must pass a session object as first parameter!';
-
 		var module = this.module;
 		var global = module.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
+
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		var contracts = ethnodemodule.getContractsObject(session);
@@ -138,8 +156,14 @@ var ModuleControllers = class {
 		var values = [];
 		
 		var module = this.module;
-		
 		var global = module.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
+		
 		var commonmodule = global.getModuleObject('common');
 		
 		var commoncontrollers = commonmodule.getControllersObject();
@@ -237,14 +261,17 @@ var ModuleControllers = class {
 		if (!contract)
 			return;
 		
-		if (session instanceof Session !== true)
-			throw 'must pass a session object as first parameter!';
-
-		console.log("Controllers.saveERC20TokenObject called for contract uuid " + contract.getUUID());
-
 		var module = this.module;
 		var global = module.global;
 		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
+
+		console.log("Controllers.saveERC20TokenObject called for contract uuid " + contract.getUUID());
+
 		var commonmodule = global.getModuleObject('common');
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
@@ -263,12 +290,15 @@ var ModuleControllers = class {
 	saveERC20Tokens(session, callback) {
 		console.log("Controllers.saveERC20Tokens called");
 		
-		if (session instanceof Session !== true)
-			throw 'must pass a session object as first parameter!';
-
 		var module = this.module;
 		var global = module.global;
 		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
+
 		var commonmodule = global.getModuleObject('common');
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
@@ -289,6 +319,12 @@ if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 GlobalClass.registerModuleClass('erc20', 'Controllers', ModuleControllers);
 else if (typeof window !== 'undefined') {
 	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('erc20', 'Controllers', ModuleControllers);
+}
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
 	
 	_GlobalClass.registerModuleClass('erc20', 'Controllers', ModuleControllers);
 }

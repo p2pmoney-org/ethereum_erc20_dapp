@@ -301,7 +301,10 @@ else if (typeof window !== 'undefined') {
 	_GlobalClass.registerModuleClass('common', 'Account', Account);
 	_GlobalClass.registerModuleClass('common', 'AccountMap', AccountMap);
 }
-else {
-	module.exports = Account; // we are in node js
-	Account.AccountMap = AccountMap; 
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('common', 'Account', Account);
+	_GlobalClass.registerModuleClass('common', 'AccountMap', AccountMap);
 }

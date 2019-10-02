@@ -249,5 +249,9 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.registerModuleClass('ethchainreader', 'Block', Block);
 }
-else
-module.exports = Block; // we are in node js
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('ethchainreader', 'Block', Block);
+}

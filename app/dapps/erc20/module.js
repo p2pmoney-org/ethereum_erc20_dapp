@@ -86,8 +86,28 @@ var Module = class {
 		return this.isloading;
 	}
 	
+	_getGlobalObject() {
+		var _global = (this.global ? this.global : null);
+		
+		if (!_global) {
+			let _GlobalClass;
+
+			if (typeof window !== 'undefined') {
+				_GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+			}
+			else if (typeof global !== 'undefined') {
+				// we are in node js
+				_GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+			}
+			
+			_global = _GlobalClass.getGlobalObject();
+		}
+			
+		return _global;
+	}
+	
 	registerModel() {
-		var global = (this.global ? this.global : GlobalClass.getGlobalObject());
+		var global = this._getGlobalObject();
 		
 		if (global.isGlobalScopeInitializing())
 			throw 'registerModel is called too late, after global scope intialization started.'
@@ -102,7 +122,9 @@ var Module = class {
 		dappsmodelsloader.push_script( moduleroot + '/includes/module.js', function() {
 			// load module if initialization has finished
 			if (global.isReady())
-			global.loadModule('erc20', dappsmodelsloader);
+				global.loadModule('erc20', dappsmodelsloader);
+			else if (global.hasGlobalScopeInitializationStarted())
+				console.log('WARNING: erc20 may be too late for load all module!');
 		 });
 		
 	}
@@ -135,4 +157,15 @@ else if (typeof window !== 'undefined') {
 	// dependencies
 	_GlobalClass.getGlobalObject().registerModuleDepency('erc20-dapp', 'dapps');		
 }
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+
+	// dependencies
+	_GlobalClass.getGlobalObject().registerModuleDepency('erc20-dapp', 'dapps');		
+}
+
+
 

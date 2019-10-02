@@ -737,5 +737,9 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.registerModuleClass('common', 'Session', Session);
 }
-else
-module.exports = Session; // we are in node js
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('common', 'Session', Session);
+}

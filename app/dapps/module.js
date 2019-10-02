@@ -62,14 +62,34 @@ var Module = class {
 		return modulescriptloader;
 	}
 	
+	_getGlobalObject() {
+		var _global = (this.global ? this.global : null);
+		
+		if (!_global) {
+			let _GlobalClass;
+
+			if (typeof window !== 'undefined') {
+				_GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+			}
+			else if (typeof global !== 'undefined') {
+				// we are in node js
+				_GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+			}
+			
+			_global = _GlobalClass.getGlobalObject();
+		}
+			
+		return _global;
+	}
+	
 	registerDappsModules() {
-		var global = (this.global ? this.global : GlobalClass.getGlobalObject());
+		var global = this._getGlobalObject();
 		
 		console.log('registerDappsModules called for ' + this.name);
 		
 		var modulescriptloader = global.findScriptLoader('moduleloader');
 		var dappsscriptloader = global.findScriptLoader('dappmodulesloader');
-		var dappsmodelsloader = modulescriptloader.getChildLoader('dappsmodelsloader');
+		var dappsmodelsloader = dappsscriptloader.getChildLoader('dappsmodelsloader');
 
 		var moduleroot = './dapps';
 
@@ -77,7 +97,9 @@ var Module = class {
 		dappsscriptloader.push_script( moduleroot + '/erc20/module.js', function() {
 			// load module if initialization has finished
 			if (global.isReady())
-			global.loadModule('erc20-dapp', modulescriptloader);
+				global.loadModule('erc20-dapp', modulescriptloader);
+			else if (global.hasGlobalScopeInitializationStarted())
+				console.log('WARNING: erc20-dapp may be too late for load all module!');
 			
 			// then load models
 			dappsmodelsloader.load_scripts();
@@ -201,6 +223,15 @@ if ( typeof GlobalClass !== 'undefined' && GlobalClass ) {
 }
 else if (typeof window !== 'undefined') {
 	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+
+	// dependencies
+	_GlobalClass.getGlobalObject().registerModuleDepency('dapps', 'common');		
+}
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
 	
 	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
 

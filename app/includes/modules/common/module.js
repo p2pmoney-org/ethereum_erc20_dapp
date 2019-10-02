@@ -253,9 +253,13 @@ var Module = class {
 	
 	// user
 	createBlankUserObject(session) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
+		var global = session.getGlobalObject();
 		
 		return new this.User(session);
 	}
@@ -264,30 +268,50 @@ var Module = class {
 	
 	// crypto keys
 	getCryptoKeyObject(session, address) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		return session.getCryptoKeyObject(address);
 	}
 	
 	createBlankCryptoKeyObject(session) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		return session.createBlankCryptoKeyObject();
 	}
 	
 	// accounts
 	getAccountObject(session, address) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		return session.getAccountObject(address);
 	}
 	
 	createBlankAccountObject(session) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		return session.createBlankAccountObject();
 	}
@@ -298,6 +322,12 @@ if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 GlobalClass.getGlobalObject().registerModuleObject(new Module());
 else if (typeof window !== 'undefined') {
 	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+}
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
 	
 	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
 }

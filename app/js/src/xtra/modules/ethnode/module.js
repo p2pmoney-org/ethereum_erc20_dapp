@@ -242,10 +242,14 @@ var Module = class {
 	
 	// instances of interfaces
 	getEthereumNodeAccessInstance(session) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
-		var global = this.global;
+		var global = session.getGlobalObject();
+		
 		var ethereumnodeaccessmodule = global.getModuleObject('ethereum-node-access');
 		
 		return ethereumnodeaccessmodule.getEthereumNodeAccessInstance(session);
@@ -269,7 +273,10 @@ var Module = class {
 	}
 	
 	unlockAccount(session, account, password, duration, callback) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
 		var global = session.getGlobalObject();
@@ -295,10 +302,14 @@ var Module = class {
 	}
 	
 	lockAccount(session, account, callback) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
 		var global = session.getGlobalObject();
+		
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		if (ethnodemodule.needToUnlockAccounts() === false) {
@@ -319,10 +330,14 @@ var Module = class {
 	}
 	
 	isAccountLocked(session, account) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
 		var global = session.getGlobalObject();
+		
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		if (ethnodemodule.needToUnlockAccounts() === false) 
@@ -341,10 +356,14 @@ var Module = class {
 	}
 	
 	getAccountBalance(session, account) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
 		var global = session.getGlobalObject();
+		
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
@@ -356,10 +375,14 @@ var Module = class {
 	
 	// chain async
 	getChainAccountBalance(session, account, callback) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
 		var global = session.getGlobalObject();
+		
 		var ethnodemodule = global.getModuleObject('ethnode');
 
 		var EthereumNodeAccess = ethnodemodule.getEthereumNodeAccessInstance(session);
@@ -372,10 +395,14 @@ var Module = class {
 	transferAmount(session, fromaccount, toaccount, amount, gas, gasPrice, transactionuuid, callback) {
 		console.log('Account.transferAmount called for amount ' + amount + ' to ' + (toaccount ? toaccount.getAddress() : null) + ' with transactionuuid ' + transactionuuid);
 		
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
 		var global = session.getGlobalObject();
+		
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		var ethereumnodeaccessmodule = global.getModuleObject('ethereum-node-access');
@@ -444,8 +471,13 @@ var Module = class {
 	}
 	
 	getWalletAccountObject(session) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		var address = this.getWalletAccountAddress(session);
 		
@@ -460,8 +492,13 @@ var Module = class {
 	
 	// contracts
 	getContractsObject(session, bForceRefresh, callback) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		if ((session.contracts) 
 				&& (!bForceRefresh) 
@@ -473,7 +510,6 @@ var Module = class {
 			return session.contracts;
 		}
 		
-		var global = this.global;
 		var self = this;
 		
 		if (session.contracts) {
@@ -526,9 +562,11 @@ var Module = class {
 		var global = this.global;
 		var self = this;
 		
-		if (session instanceof Session !== true)
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
 		
+		var global = session.getGlobalObject();
 		
 		var keys = ['common','contracts'];
 
@@ -552,8 +590,13 @@ var Module = class {
 
 	// contract instance
 	getContractInstance(session, contractaddress, contractartifact) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		var contractinstance = new this.ContractInstance(session, contractaddress, contractartifact);
 		
@@ -562,8 +605,13 @@ var Module = class {
 	
 	// transactions
 	getTransactionObject(session, transactionuuid) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		var transaction = new this.Transaction(session, transactionuuid);
 		
@@ -575,8 +623,13 @@ var Module = class {
 	}
 	
 	getTransactionList(session, callback) {
-		if (session instanceof Session !== true)
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
 			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
 		
 		var EthereumNodeAccess = this.getEthereumNodeAccessInstance(session);
 		
@@ -597,20 +650,27 @@ var Module = class {
 	}
 }
 
-if ( typeof GlobalClass !== 'undefined' && GlobalClass )
-GlobalClass.getGlobalObject().registerModuleObject(new Module());
+if ( typeof GlobalClass !== 'undefined' && GlobalClass ) {
+	GlobalClass.getGlobalObject().registerModuleObject(new Module());
+	
+	GlobalClass.getGlobalObject().registerModuleDepency('ethnode', 'common');
+}
 else if (typeof window !== 'undefined') {
 	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
 	
 	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
-}
-
-
-// dependencies
-if ( typeof GlobalClass !== 'undefined' && GlobalClass )
-GlobalClass.getGlobalObject().registerModuleDepency('ethnode', 'common');
-else if (typeof window !== 'undefined') {
-	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
 	
+	// dependencies
 	_GlobalClass.getGlobalObject().registerModuleDepency('ethnode', 'common');
 }
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+	
+	// dependencies
+	_GlobalClass.getGlobalObject().registerModuleDepency('ethnode', 'common');
+}
+
+

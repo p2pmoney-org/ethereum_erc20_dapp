@@ -65,7 +65,7 @@ var ERC20Token = class {
 		var session = this.session;
 		var contractuuid = this.getUUID();
 		
-		var global = GlobalClass.getGlobalObject();
+		var global = session.getGlobalObject();
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		this.contractlocalpersistor = new erc20tokenmodule.ERC20TokenLocalPersistor(session, contractuuid)
@@ -79,7 +79,8 @@ var ERC20Token = class {
 		
 		//console.log('json is ' + JSON.stringify(json));
 		
-		var global = GlobalClass.getGlobalObject();
+		var session = this.session;
+		var global = session.getGlobalObject();
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		// load local ledger elements (if any)
@@ -289,7 +290,7 @@ var ERC20Token = class {
 		var session = this.session;
 		var contractaddress = this.address;
 		
-		var global = GlobalClass.getGlobalObject();
+		var global = session.getGlobalObject();
 		var erc20tokenmodule = global.getModuleObject('erc20');
 		
 		this.contractinterface = new erc20tokenmodule.ERC20TokenContractInterface(session, contractaddress)
@@ -644,7 +645,10 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.registerModuleClass('erc20', 'ERC20Token', ERC20Token);
 }
-else
-	module.exports = ERC20Token; // we are in node js
-
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('erc20', 'ERC20Token', ERC20Token);
+}
 	

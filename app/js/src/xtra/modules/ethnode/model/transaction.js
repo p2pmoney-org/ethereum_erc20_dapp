@@ -132,5 +132,9 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.registerModuleClass('ethnode', 'Transaction', Transaction);
 }
-else
-	module.exports = Transaction; // we are in node js
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('ethnode', 'Transaction', Transaction);
+}

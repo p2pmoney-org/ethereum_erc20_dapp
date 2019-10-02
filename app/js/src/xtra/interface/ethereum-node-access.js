@@ -32,16 +32,19 @@ var Module = class {
 			
 		this.isloading = true;
 
+		//var _globalscope = (typeof window !== 'undefined' && window  ? window : (typeof global !== 'undefined' && global ? global : console.log('WARNING: could not find global scope!')));
 		var self = this;
-		var global = this.global;
-		var ScriptLoader = window.simplestore.ScriptLoader;
 		
-		var modulescriptloader = global.getScriptLoader('ethereumnodeaccessmoduleloader', parentscriptloader);
+		var _global = this.global;
+		
+		//var ScriptLoader = _globalscope.simplestore.ScriptLoader;
+		
+		var modulescriptloader = _global.getScriptLoader('ethereumnodeaccessmoduleloader', parentscriptloader);
 
 		//var moduleroot = ScriptLoader.getDappdir() + './js/src/xtra/lib';
 		var moduleroot = './js/src/xtra/lib';
 
-		if (global.isInBrowser()) {
+		if (_global.isInBrowser()) {
 			if (this.web3_version  == "1.0.x") {
 				modulescriptloader.push_script( moduleroot + '/web3.min-1.0.0-beta36.js');
 			}
@@ -130,9 +133,12 @@ var Module = class {
 				throw 'Web3 should be available in window.simplestore.Web3';
 			}
 		}
-		else {
-			throw 'nodejs not implemented';
+		else if (typeof global !== 'undefined') {
+			return global.simplestore.Web3;
 			//return require('web3');
+		}
+		else {
+			throw 'not implemented';
 		}
 	}
 	
@@ -1656,16 +1662,41 @@ class EthereumNodeAccess {
 	
 	// contracts
 	_loadArtifact(jsonfile, callback) {
-		var loadpromise = $.getJSON(jsonfile, function(data) {
+		var session = this.session;
+		var _global = session.getGlobalObject();
+		
+		if (_global.isInBrowser()) {
+			// load from the server
+			var loadpromise = $.getJSON(jsonfile, function(data) {
 				console.log('contract json file read ');
 
 				if (callback)
 					callback(data);
 
 				return data;
-		});
-		
-		return loadpromise;
+			});
+			
+			return loadpromise;
+			
+		}
+		else {
+			// ask storage module to load from local space
+			var storageaccessmodule = _global.getModuleObject('storage-access');
+			var loadpromise = new Promise(function (resolve, reject) {
+				storageaccessmodule.loadClientSideJsonArtifact(session, jsonfile, function(err, res) {
+					console.log('contract json file read ');
+
+					if (callback)
+						callback(res);
+					
+					resolve(res);
+					
+					return res;
+				});
+			});
+			
+			return loadpromise;
+		}
 	}
 	
 	/*_getWeb3ContractObject(contractartifact) {
@@ -2273,8 +2304,8 @@ class EthereumNodeAccess {
 
 if ( typeof window !== 'undefined' && window ) // if we are in browser and not node js (e.g. truffle)
 window.simplestore.EthereumNodeAccess = EthereumNodeAccess;
-else
-module.exports = EthereumNodeAccess; // we are in node js
+else if (typeof global !== 'undefined')
+global.simplestore.EthereumNodeAccess = EthereumNodeAccess; // we are in node js
 
 if ( typeof GlobalClass !== 'undefined' && GlobalClass )
 GlobalClass.getGlobalObject().registerModuleObject(new Module());
@@ -2283,6 +2314,12 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
 }
-
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+}
+	
 
 

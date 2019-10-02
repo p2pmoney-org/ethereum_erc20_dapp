@@ -111,5 +111,9 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.registerModuleClass('common', 'User', User);
 }
-else
-module.exports = User; // we are in node js
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('common', 'User', User);
+}

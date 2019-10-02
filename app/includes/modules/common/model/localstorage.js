@@ -239,8 +239,14 @@ var LocalStorage = class {
 		var json;
 
 		if (this.session.isAnonymous()) {
-			json = storageaccess.readClientSideJson(keys);
+			json = storageaccess.readClientSideJson(keys, function(err, res) {
+				json = res;
+				
+				if (!err)
+				self.storagemap.updateJson(key, json);
+			});
 
+			if (json)
 			this.storagemap.updateJson(key, json);
 			
 			if (callback)
@@ -314,5 +320,9 @@ else if (typeof window !== 'undefined') {
 	
 	_GlobalClass.registerModuleClass('common', 'LocalStorage', LocalStorage);
 }
-else
-	module.exports = LocalStorage; // we are in node js
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
+	
+	_GlobalClass.registerModuleClass('common', 'LocalStorage', LocalStorage);
+}

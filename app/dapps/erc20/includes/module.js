@@ -78,7 +78,27 @@ var Module = class {
 		global.registerHook('postFinalizeGlobalScopeInit_hook', this.name, this.postFinalizeGlobalScopeInit_hook);
 		
 		global.registerHook('creatingSession_hook', this.name, this.creatingSession_hook);
+		
+		// signal module is ready
+		var rootscriptloader = global.getRootScriptLoader();
+		rootscriptloader.signalEvent('on_erc20_module_ready');
 	}
+	
+	postRegisterModule() {
+		console.log('postRegisterModule called for ' + this.name);
+		if (!this.isloading) {
+			var global = this.global;
+			var self = this;
+			
+			var parentscriptloader = global.findScriptLoader('dappsmodelsloader');;
+			
+			this.loadModule(parentscriptloader, function() {
+				if (self.registerHooks)
+				self.registerHooks();
+			});
+		}
+	}
+
 	
 	//
 	// hooks
@@ -255,6 +275,15 @@ if ( typeof GlobalClass !== 'undefined' && GlobalClass ) {
 }
 else if (typeof window !== 'undefined') {
 	let _GlobalClass = ( window && window.simplestore && window.simplestore.Global ? window.simplestore.Global : null);
+	
+	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
+
+	// dependencies
+	_GlobalClass.getGlobalObject().registerModuleDepency('erc20', 'erc20-dapp');		
+}
+else if (typeof global !== 'undefined') {
+	// we are in node js
+	let _GlobalClass = ( global && global.simplestore && global.simplestore.Global ? global.simplestore.Global : null);
 	
 	_GlobalClass.getGlobalObject().registerModuleObject(new Module());
 
