@@ -1872,7 +1872,7 @@ class Controllers {
 		var global = this.global;
 		var app = this.getAppObject();
 		
-		var session = this.getSessionObject($scope);
+		var session = this.getCurrentSessionObject();
 
 		if (privatekey != null) {
 			
