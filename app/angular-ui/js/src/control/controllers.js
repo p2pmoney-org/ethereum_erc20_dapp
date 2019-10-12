@@ -563,12 +563,19 @@ class Controllers {
 		var app = this.getAppObject();
 		var mvcmodule = global.getModuleObject('mvc');
 
-		var versioninfo = {};
+		var coreversioninfo = {};
 		
-		versioninfo.label = global.t('ethereum dapp');
-		versioninfo.value = mvcmodule.current_version;
+		coreversioninfo.label = global.t('ethereum core');
+		coreversioninfo.value = commonmodule.current_version;
 		
-		versioninfos.push(versioninfo);
+		versioninfos.push(coreversioninfo);
+		
+		var dappversioninfo = {};
+		
+		dappversioninfo.label = global.t('ethereum dapp');
+		dappversioninfo.value = mvcmodule.current_version;
+		
+		versioninfos.push(dappversioninfo);
 		
 		$scope.versioninfos = versioninfos;
 		
