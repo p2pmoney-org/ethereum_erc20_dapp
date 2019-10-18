@@ -490,6 +490,7 @@ var DAPPControllers = class {
 			var livestatusstring = erc20tokenviews.getERC20TokenLiveStatusString(erc20tokencontract);
 
 
+			var web3providerurl = erc20tokencontract.getWeb3ProviderUrl();
 			
 			$scope.erc20tokenuuid = {
 					text: erc20tokencontract.getUUID()
@@ -522,6 +523,10 @@ var DAPPControllers = class {
 			
 			$scope.status = {
 					text: statusstring
+			};
+			
+			$scope.web3providerurl = {
+					text: web3providerurl
 			};
 			
 			
