@@ -992,6 +992,7 @@ class Controllers {
 		transaction.to = global.t('loading...');
 		transaction.value = global.t('loading...');
 		transaction.status = global.t('loading...');
+		transaction.web3providerurl = global.t('loading...');
 
 		transaction.transactionhash = global.t('loading...');
 		
@@ -1017,6 +1018,7 @@ class Controllers {
 				transaction.ethervalue = parseFloat(tx.getValue());
 				transaction.value = ( transaction.ethervalue ? transaction.ethervalue.toFixed(2) + ' Ether' : '');
 				transaction.status = views.getTransactionStatusString(tx);
+				transaction.web3providerurl = tx.getWeb3ProviderUrl();
 				
 				transaction.transactionhash = tx.getTransactionHash();
 				
@@ -1069,6 +1071,7 @@ class Controllers {
 				transaction.to = global.t('not found');
 				transaction.value = global.t('not found');
 				transaction.status = global.t('not found');
+				transaction.web3providerurl = global.t('not found');
 				
 				transaction.gaslimit = global.t('not found');
 				transaction.gasprice = global.t('not found');

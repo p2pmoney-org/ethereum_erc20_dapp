@@ -674,8 +674,9 @@ var DAPPControllers = class {
 						
 						
 						// write ether balance for this account
+						var web3providerurl = erc20tokencontract.getWeb3ProviderUrl();
 						var writeetherbalance = function(accountposition, account) {
-							ethnodemodule.getChainAccountBalance(session, account, function(err, res) {
+							ethnodemodule.getAltChainAccountBalance(session, account, web3providerurl, function(err, res) {
 								if (err) {
 									accountposition['ether_balance'] = global.t('error');
 								}
