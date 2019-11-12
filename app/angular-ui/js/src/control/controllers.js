@@ -124,7 +124,7 @@ class Controllers {
 		
 		// menu bar
 		angular_app.controller("MenuBarCtrl",  ['$scope', function ($scope) {
-			controllers.preparMenuBarView($scope);
+			controllers.prepareMenuBarView($scope);
 		}]);
 
 		// partials
@@ -181,6 +181,14 @@ class Controllers {
 		
 		angular_app.controller("LogoutFormCtrl", ['$scope', function ($scope) {
 			controllers.prepareLogoutForm($scope);
+		}]);
+		
+		angular_app.controller("OpenVaultFormCtrl", ['$scope', function ($scope) {
+			controllers.prepareOpenVaultForm($scope);
+		}]);
+		
+		angular_app.controller("CreateVaultFormCtrl", ['$scope', function ($scope) {
+			controllers.prepareCreateVaultForm($scope);
 		}]);
 		
 		
@@ -317,19 +325,19 @@ class Controllers {
 	    .push(['home.account', {url: '/account', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/account.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Account') }}]);
 	  	statearray
-	    .push(['home.account.eth-accounts', {url: '/account/eth-accounts', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/eth-accounts.html'), controller: "PageRequestHandler",}},
+	    .push(['home.account.eth-accounts', {url: '/eth-accounts', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/eth-accounts.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Ethereum Accounts') }}]);
 	  	statearray
-	    .push(['home.account.eth-accounts.view', {url: '/account/eth-accounts/view/:uuid', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/eth-account.html'), controller: "PageRequestHandler",}},
+	    .push(['home.account.eth-accounts.view', {url: '/eth-accounts/view/:uuid', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/eth-account.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('View') }}]);
 	  	statearray
-	    .push(['home.account.cryptokeys', {url: '/account/cryptokeys', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/cryptokeys.html'), controller: "PageRequestHandler",}},
+	    .push(['home.account.cryptokeys', {url: '/cryptokeys', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/cryptokeys.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Crypto Keys') }}]);
 	  	statearray
-	    .push(['home.account.transfer', {url: '/account/transfer', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/ether-transfer.html'), controller: "PageRequestHandler",}},
+	    .push(['home.account.transfer', {url: '/transfer', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/ether-transfer.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Transfer') }}]);
 	  	statearray
-	    .push(['home.account.transaction-history', {url: '/account/txhistory', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/transaction-history.html'), controller: "PageRequestHandler",}},
+	    .push(['home.account.transaction-history', {url: '/txhistory', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/transaction-history.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Tx History') }}]);
 	  	statearray
 	    .push(['home.account.transaction-history.tx', {url: '/tx/:uuid', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/transaction-view.html'), controller: "PageRequestHandler",}},
@@ -340,6 +348,15 @@ class Controllers {
 	  	statearray
 	    .push(['home.logout', {url: '/logout', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/logout.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Logout') }}]);
+	  	statearray
+	    .push(['home.vaults', {url: '/vaults', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/vaults.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Vaults') }}]);
+	  	statearray
+	    .push(['home.vaults.open', {url: '/open', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/vault-open.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Open') }}]);
+	  	statearray
+	    .push(['home.vaults.create', {url: '/create', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/vault-create.html'), controller: "PageRequestHandler",}},
+	        ncyBreadcrumb: { label: global.t('Create') }}]);
 	  	statearray
 	    .push(['home.sessions', {url: '/sessions', views: {'main@': {templateUrl: app.getHtmlUrl('./angular-ui/templates/sessions.html'), controller: "PageRequestHandler",}},
 	        ncyBreadcrumb: { label: global.t('Sessions') }}]);
@@ -518,8 +535,8 @@ class Controllers {
         // end test
 	}
 	
-	preparMenuBarView($scope) {
-		console.log("Controllers.preparMenuBarView called");
+	prepareMenuBarView($scope) {
+		console.log("Controllers.prepareMenuBarView called");
 		
 		var global = this.global;
 		
@@ -1101,6 +1118,7 @@ class Controllers {
 
 		var global = this.global;
 		var self = this;
+		var session = this.getSessionObject($scope);
 		
 		var loginform = document.getElementById("loginForm");
 		
@@ -1111,6 +1129,7 @@ class Controllers {
 			
 			params.push($scope);
 			params.push(loginform);
+			params.push(session);
 
 			var ret = global.invokeHooks('alterLoginForm_hook', result, params);
 			
@@ -1175,6 +1194,7 @@ class Controllers {
 
 		var global = this.global;
 		var self = this;
+		var session = this.getSessionObject($scope);
 		
 		var logoutform = document.getElementById("logoutForm");
 		
@@ -1185,6 +1205,7 @@ class Controllers {
 			
 			params.push($scope);
 			params.push(logoutform);
+			params.push(session);
 
 			var ret = global.invokeHooks('alterLogoutForm_hook', result, params);
 			
@@ -1235,6 +1256,205 @@ class Controllers {
 		
 	}
 	
+	// open vault
+	prepareOpenVaultForm($scope) {
+		console.log("Controllers.prepareOpenVaultForm called");
+
+		var global = this.global;
+		var self = this;
+		var session = this.getSessionObject($scope);
+		
+		var openvaultform = document.getElementById("openVaultForm");
+		
+		angular.element(document).ready(function () {
+			var result = [];
+			
+			var params = [];
+			
+			params.push($scope);
+			params.push(openvaultform);
+			params.push(session);
+
+			var ret = global.invokeHooks('alterOpenVaultForm_hook', result, params);
+			
+			if (ret && result && result.length) {
+				console.log('openvaultform overload handled by a module');			
+			}
+	    });
+		
+		
+		// submit function
+		$scope.handleSubmit = function(){
+			self.handleOpenVaultSubmit($scope);
+		}
+	}
+	
+	_openVault(session, vaultname, passphrase, callback) {
+		var global = this.global;
+		var app = this.getAppObject();
+		var commonmodule = global.getModuleObject('common');
+		
+		commonmodule.openVault(session, vaultname, passphrase, (err, res) => {
+			var vault = res;
+			
+			if (vault) {
+				var cryptokey = vault.getCryptoKey();
+				
+				// impersonate with vault's name and crypto key uuid
+				var user = commonmodule.createBlankUserObject(session);
+
+				user.setUserName(vaultname);
+				user.setUserUUID(cryptokey.getKeyUUID());
+				
+				session.impersonateUser(user);
+				
+				// add crypto key to session
+				session.addCryptoKeyObject(cryptokey);
+
+				// read accounts
+				var storagemodule = global.getModuleObject('storage-access');
+				var storageaccess = storagemodule.getStorageAccessInstance(session);
+				
+				storageaccess.account_session_keys( (err, res) => {
+					
+					if (res && res['keys']) {
+						var keys = res['keys'];
+						
+						session.readSessionAccountFromKeys(keys);
+					}
+			
+					app.refreshDisplay();
+					
+					if (callback)
+						callback(null, vault);
+				});
+				
+			}
+			else {
+				var error = global.t('Could not open vault') + ' ' + vaultname;
+				alert(error);
+				
+				if (callback)
+					callback(error, null);
+			}
+			
+		});
+		
+	}
+	
+	handleOpenVaultSubmit($scope) {
+		console.log("Controllers.handleOpenVaultSubmit called");
+		
+		var global = this.global;
+		var app = this.getAppObject();
+		var session = this.getSessionObject($scope);
+		
+		var result = [];
+		
+		var params = [];
+		
+		params.push($scope);
+		params.push(session);
+
+		var ret = global.invokeHooks('handleOpenVaultSubmit_hook', result, params);
+		
+		if (ret && result && result.length) {
+			console.log('handleOpenVaultSubmit overloaded by a module');			
+		}
+		else {
+			var vaultname = $scope.vaultname.text;
+			var password = $scope.password.text;
+			
+			// open vault
+			this._openVault(session, vaultname, password, (err, res) => {
+				app.refreshDisplay();
+				
+				this.gotoHome();
+			});
+		}
+
+
+	}
+	
+
+	// create vault
+	prepareCreateVaultForm($scope) {
+		console.log("Controllers.prepareCreateVaultForm called");
+
+		var global = this.global;
+		var self = this;
+		var session = this.getSessionObject($scope);
+		
+		var createvaultform = document.getElementById("createVaultForm");
+		
+		angular.element(document).ready(function () {
+			var result = [];
+			
+			var params = [];
+			
+			params.push($scope);
+			params.push(openvaultform);
+			params.push(session);
+
+			var ret = global.invokeHooks('alterCreateVaultForm_hook', result, params);
+			
+			if (ret && result && result.length) {
+				console.log('createvaultform overload handled by a module');			
+			}
+	    });
+		
+		
+		// submit function
+		$scope.handleSubmit = function(){
+			self.handleCreateVaultSubmit($scope);
+		}
+	}
+	
+	handleCreateVaultSubmit($scope) {
+		console.log("Controllers.handleCreateVaultSubmit called");
+		
+		var global = this.global;
+		var app = this.getAppObject();
+		var session = this.getSessionObject($scope);
+		
+		var result = [];
+		
+		var params = [];
+		
+		params.push($scope);
+		params.push(session);
+
+		var ret = global.invokeHooks('handleCreateVaultSubmit_hook', result, params);
+		
+		if (ret && result && result.length) {
+			console.log('handleCreateVaultSubmit_hook overloaded by a module');			
+		}
+		else {
+			var vaultname = $scope.vaultname.text;
+			
+			var password = $scope.password.text;
+			var passwordconfirm = $scope.passwordconfirm.text;
+			
+			if (password == passwordconfirm) {
+				var commonmodule = global.getModuleObject('common');
+				
+				commonmodule.createVault(session, vaultname, password, (err, res) => {
+					// open vault
+					this._openVault(session, vaultname, password, (err, res) => {
+						app.refreshDisplay();
+						
+						this.gotoHome();
+					});
+				});
+			}
+				
+		}
+
+	}
+	
+	
+	
+	// sessions
 	_getSessionArray($rootScope, $scope) {
 		var self = this;
 		
