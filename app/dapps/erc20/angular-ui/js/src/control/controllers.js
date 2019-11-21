@@ -652,10 +652,14 @@ var DAPPControllers = class {
 						var accountaddress = account.getAddress();
 						var accountdescription = account.getDescription();
 						
+						var origin = account.getOrigin()
+						var accountorigin =( origin && origin.storage ? global.t(origin.storage) : global.t('unknown'));
+
 						accountposition['erc20tokenindex'] = erc20tokencontract.getContractIndex();
 						accountposition['erc20tokenuuid'] = erc20tokencontract.getUUID();
 						
 						accountposition['address'] = accountaddress;
+						accountposition['origin'] = accountorigin;
 						accountposition['description'] = accountdescription;
 						accountposition['balance'] = global.t('loading');
 						accountposition['ether_balance'] = global.t('loading');

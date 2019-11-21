@@ -660,6 +660,8 @@ class Controllers {
 		
 		var nodeinfo = [];
 		
+		nodeinfo.web3providerUrl = ethereumnodeaccess.web3_getProviderUrl();
+
 		nodeinfo.islistening = global.t('loading');
 		nodeinfo.networkid = global.t('loading');
 		nodeinfo.peercount = global.t('loading');
@@ -780,6 +782,10 @@ class Controllers {
 						cryptokey['uuid'] = cryptokeyobj.getKeyUUID();
 
 						cryptokey['description'] = cryptokeyobj.getDescription();
+
+						var origin = cryptokeyobj.getOrigin();
+						cryptokey['origin'] = (origin && origin.storage ?  global.t(origin.storage) : global.t('unknown'));
+						
 						cryptokey['address'] = cryptokeyobj.getAddress();
 						cryptokey['public_key'] = cryptokeyobj.getPublicKey();
 						
@@ -792,24 +798,6 @@ class Controllers {
 			// from a promise or direct continuation of the code
 			self._apply($scope);
 		});
-		
-		/*if (cryptokeyarray) {
-			for (var i = 0; i < cryptokeyarray.length; i++) {
-				var cryptokeyobj = cryptokeyarray[i];
-				
-				if (cryptokeyobj) {
-					var cryptokey = [];
-					
-					cryptokey['uuid'] = cryptokeyobj.getKeyUUID();
-
-					cryptokey['description'] = cryptokeyobj.getDescription();
-					cryptokey['address'] = cryptokeyobj.getAddress();
-					cryptokey['public_key'] = cryptokeyobj.getPublicKey();
-					
-					cryptokeys.push(cryptokey);
-				}
-			}
-		}*/
 		
 		$scope.cryptokeys = cryptokeys;
 	}
@@ -849,6 +837,10 @@ class Controllers {
 
 						ethaccount['description'] = (account.getDescription() !== null ? account.getDescription() : account.getAddress());
 						ethaccount['type'] = (account.getPrivateKey() !== null ? global.t('personal') : global.t('3rd party'));
+						
+						var origin = account.getOrigin();
+						ethaccount['origin'] = (origin && origin.storage ?  global.t(origin.storage) : global.t('unknown'));
+						
 						ethaccount['address'] = account.getAddress();
 						ethaccount['public_key'] = account.getPublicKey();
 						ethaccount['rsa_public_key'] = account.getRsaPublicKey();
@@ -1289,16 +1281,16 @@ class Controllers {
 		}
 	}
 	
-	_openVault(session, vaultname, passphrase, callback) {
+	_openVault(session, vaultname, passphrase, type, callback) {
 		var global = this.global;
 		var app = this.getAppObject();
 		var commonmodule = global.getModuleObject('common');
 		
-		commonmodule.openVault(session, vaultname, passphrase, (err, res) => {
+		commonmodule.openVault(session, vaultname, passphrase, type, (err, res) => {
 			var vault = res;
 			
 			if (vault) {
-				var cryptokey = vault.getCryptoKey();
+				var cryptokey = vault.getCryptoKeyObject();
 				
 				// impersonate with vault's name and crypto key uuid
 				var user = commonmodule.createBlankUserObject(session);
@@ -1308,7 +1300,8 @@ class Controllers {
 				
 				session.impersonateUser(user);
 				
-				// add crypto key to session
+				// add crypto key to session and user
+				user.addCryptoKeyObject(cryptokey);
 				session.addCryptoKeyObject(cryptokey);
 
 				// read accounts
@@ -1332,7 +1325,7 @@ class Controllers {
 			}
 			else {
 				var error = global.t('Could not open vault') + ' ' + vaultname;
-				alert(error);
+				alert(global.t(error));
 				
 				if (callback)
 					callback(error, null);
@@ -1365,8 +1358,10 @@ class Controllers {
 			var vaultname = $scope.vaultname.text;
 			var password = $scope.password.text;
 			
-			// open vault
-			this._openVault(session, vaultname, password, (err, res) => {
+			// open vault (0 for vault specifically on the client)
+			var vaulttype = 0;
+			
+			this._openVault(session, vaultname, password, vaulttype, (err, res) => {
 				app.refreshDisplay();
 				
 				this.gotoHome();
@@ -1393,7 +1388,7 @@ class Controllers {
 			var params = [];
 			
 			params.push($scope);
-			params.push(openvaultform);
+			params.push(createvaultform);
 			params.push(session);
 
 			var ret = global.invokeHooks('alterCreateVaultForm_hook', result, params);
@@ -1435,16 +1430,24 @@ class Controllers {
 			var password = $scope.password.text;
 			var passwordconfirm = $scope.passwordconfirm.text;
 			
+			// (0 for vault specifically on the client)
+			var vaulttype = 0;
+			
 			if (password == passwordconfirm) {
 				var commonmodule = global.getModuleObject('common');
 				
-				commonmodule.createVault(session, vaultname, password, (err, res) => {
-					// open vault
-					this._openVault(session, vaultname, password, (err, res) => {
-						app.refreshDisplay();
-						
-						this.gotoHome();
-					});
+				commonmodule.createVault(session, vaultname, password, vaulttype, (err, res) => {
+					if (!err) {
+						// open vault 
+						this._openVault(session, vaultname, password, vaulttype, (err, res) => {
+							app.refreshDisplay();
+							
+							this.gotoHome();
+						});
+					}
+					else {
+						alert(global.t(err));
+					}
 				});
 			}
 				
@@ -2105,6 +2108,7 @@ class Controllers {
 		var session = this.getCurrentSessionObject();
 
 		if (privatekey != null) {
+			var userorigin = {storage: 'user'};
 			
 			// we add this private key as one of the session's account to perform transactions
 			var sessionaccount = global.getModuleObject('common').createBlankAccountObject(session);
@@ -2114,6 +2118,10 @@ class Controllers {
 			var address = sessionaccount.getAddress();
 			sessionaccount.setAccountUUID(address);
 			
+			// set account origin
+			sessionaccount.setOrigin(userorigin);
+			
+			// impersonate session with this account
 			session.impersonateAccount(sessionaccount);
 			
 			console.log('is anonymous: ' + (session.isAnonymous() ? 'true' : 'false'));
@@ -2121,16 +2129,22 @@ class Controllers {
 			// we add this privatekey as one of the crypto key to save data
 			var sessioncryptokey = global.getModuleObject('common').createBlankCryptoKeyObject(session);
 			
+			// set crypto key origin
+			sessioncryptokey.setOrigin(userorigin);
+			
 			sessioncryptokey.setPrivateKey(privatekey);
 			
 			var address = sessioncryptokey.getAddress();
 			sessioncryptokey.setKeyUUID(address);
 			
+			// add crypto key to session and user
+			var sessionuser = session.getSessionUserObject();
 			
+			sessionuser.addCryptoKeyObject(sessioncryptokey);
 			session.addCryptoKeyObject(sessioncryptokey);
 
 			
-
+			// refresh
 	        app.refreshDisplay();
 		}	
 		
@@ -2207,7 +2221,7 @@ class Controllers {
 			for (var i=0; i < result.length; i++) {
 				var field = result[i];
 				
-				message += ' field '+ i + ' has name ' + field['name'] + ' of type ' + field['name'];
+				message += global.t('field ') + i + ' ' + global.t('has name') + ' ' + field['name'] +  ' ' + global.t('of type') + ' ' + field['name'];
 				
 			}
 			
