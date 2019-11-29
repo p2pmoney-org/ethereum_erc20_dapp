@@ -143,6 +143,15 @@ var Module = class {
 		return localstorage.insertLocalJsonLeaf(_keys, parentuuid, collectionname, json, uuidfieldname);
 	}
 	
+	removeLocalJsonLeaf(session, keys, uuid, uuidfieldname) {
+		var commonkeys = ['common'];
+		
+		var _keys = commonkeys.concat(keys);
+
+		var localstorage = session.getLocalStorageObject();
+		return localstorage.removeLocalJsonLeaf(_keys, uuid, uuidfieldname);
+	}
+	
 	// async
 	saveLocalJson(session, keys, json, callback) {
 		var commonkeys = ['common'];
@@ -304,6 +313,30 @@ var Module = class {
 		var global = session.getGlobalObject();
 		
 		return session.getAccountObject(address);
+	}
+	
+	findAccountObjectFromUUID(session, bForceRefresh, accountuuid, callback) {
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
+		
+		return session.findAccountObjectFromUUID(bForceRefresh, accountuuid, callback);
+	}
+	
+	findAccountObjectsFromAddress(session, bForceRefresh, address, callback) {
+		var global = this.global;
+		
+		var SessionClass = (typeof Session !== 'undefined' ? Session : global.getModuleObject('common').Session);
+		if (session instanceof SessionClass !== true)
+			throw 'must pass a session object as first parameter!';
+		
+		var global = session.getGlobalObject();
+		
+		return session.findAccountObjectsFromAddress(bForceRefresh, address, callback);
 	}
 	
 	createBlankAccountObject(session) {
