@@ -1342,6 +1342,11 @@ class Controllers {
 		var app = this.getAppObject();
 		var session = this.getSessionObject($scope);
 		
+		// open vault (0 for vault specifically on the client)
+		var vaulttype = 0;
+		$scope.vaulttype = {};
+		$scope.vaulttype.text = vaulttype;
+		
 		var result = [];
 		
 		var params = [];
@@ -1357,9 +1362,6 @@ class Controllers {
 		else {
 			var vaultname = $scope.vaultname.text;
 			var password = $scope.password.text;
-			
-			// open vault (0 for vault specifically on the client)
-			var vaulttype = 0;
 			
 			this._openVault(session, vaultname, password, vaulttype, (err, res) => {
 				app.refreshDisplay();
@@ -1412,6 +1414,11 @@ class Controllers {
 		var app = this.getAppObject();
 		var session = this.getSessionObject($scope);
 		
+		// (0 for vault specifically on the client)
+		var vaulttype = 0;
+		$scope.vaulttype = {};
+		$scope.vaulttype.text = vaulttype;
+		
 		var result = [];
 		
 		var params = [];
@@ -1430,9 +1437,6 @@ class Controllers {
 			var password = $scope.password.text;
 			var passwordconfirm = $scope.passwordconfirm.text;
 			
-			// (0 for vault specifically on the client)
-			var vaulttype = 0;
-			
 			if (password == passwordconfirm) {
 				var commonmodule = global.getModuleObject('common');
 				
@@ -1449,6 +1453,10 @@ class Controllers {
 						alert(global.t(err));
 					}
 				});
+			}
+			else {
+				var error = global.t('passwords do not match');
+				alert(error);
 			}
 				
 		}
