@@ -98,7 +98,7 @@ var Module = class {
 			return;
 		
 		// if we are not anonymous, we pick among user's cryptokeys
-		// to avoid picking vaults' keys that are not necessarily open
+		// to avoid picking vaults' keys that are not necessarily always open
 		var user = session.getSessionUserObject();
 		
 		var cryptokeys = (user ? user.getCryptoKeyObjects() : session.getSessionCryptoKeyObjects());
