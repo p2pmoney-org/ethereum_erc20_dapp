@@ -1300,6 +1300,9 @@ class Controllers {
 				
 				session.impersonateUser(user);
 				
+				// re-add vault to session that cleared everything
+				session.putVault(vault);
+				
 				// add crypto key to session and user
 				user.addCryptoKeyObject(cryptokey);
 				session.addCryptoKeyObject(cryptokey);
