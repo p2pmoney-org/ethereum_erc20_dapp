@@ -352,10 +352,38 @@ var Module = class {
 	}
 	
 	// vaults
+	getVaultList(session, type, callback) {
+		var LocalVault = this.LocalVault;
+		
+		return LocalVault.getVaultList(session, vaultname, vaultype);
+	}
+	
+	checkVaultExists(session, vaultname, type, callback) {
+		var LocalVault = this.LocalVault;
+		
+		return LocalVault.checkVaultExists(session, vaultname, type, callback);
+	}
+	
+	saveVaultList(session, type, array, callback) {
+		var LocalVault = this.LocalVault;
+		
+		LocalVault.saveVaultList(session, type, array, callback);
+	}
+	
+	getVaultObject(session, vaultname, type) {
+		var LocalVault = this.LocalVault;
+		
+		return LocalVault.getVaultObject(session, vaultname, vaultype);
+	}
+	
 	openVault(session, vaultname, passphrase, type, callback) {
 		var LocalVault = this.LocalVault;
 		
-		LocalVault.openVault(session, vaultname, passphrase, type, callback);
+		LocalVault.openVault(session, vaultname, passphrase, type, (err, res) => {
+			
+			if (callback)
+				callback(err, res);
+		});
 	}
 	
 	createVault(session, vaultname, passphrase, type, callback) {
