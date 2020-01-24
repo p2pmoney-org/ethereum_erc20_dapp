@@ -10,7 +10,8 @@
     "url": "git://github.com/github.com/p2pmoney-org/ethereum_erc20_dapp.git"
   },
   "scripts": {
-    "dapp": "lite-server"
+   "start": "lite-server",
+   "dapp": "lite-server"
   },
   "dependencies": {
     "bitcore": "^0.11.7",
