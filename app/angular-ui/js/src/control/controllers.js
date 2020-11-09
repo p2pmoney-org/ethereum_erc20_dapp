@@ -589,7 +589,7 @@ class Controllers {
 		
 		var dappversioninfo = {};
 		
-		dappversioninfo.label = global.t('ethereum dapp');
+		dappversioninfo.label = global.t('ethereum angularjs dapp');
 		dappversioninfo.value = mvcmodule.current_version;
 		
 		versioninfos.push(dappversioninfo);
