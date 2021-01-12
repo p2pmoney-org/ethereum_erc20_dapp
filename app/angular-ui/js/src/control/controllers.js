@@ -27,13 +27,16 @@ class Controllers {
 			var commonmodule = global.getModuleObject('common');
 			var session = null;
 			
-			// legacy (should be removed when
-			// commonmodule.getSessionObject is discarded)
-			//session = commonmodule.getSessionObject();
-
 			if (!session) {
 				// first time, create a blank session
 				session = commonmodule.createBlankSessionObject();
+
+				// look if we are called for a pre-existing session
+				const urlParams = new URLSearchParams(window.location.search);
+				const sessionuuid = urlParams.get('sessionuuid');
+
+				if (sessionuuid)
+					session.setSessionUUID(sessionuuid);
 			}
 			
 			this.session = session;
@@ -580,13 +583,13 @@ class Controllers {
 		var app = this.getAppObject();
 		var mvcmodule = global.getModuleObject('mvc');
 
-		var coreversioninfo = {};
+/* 		var coreversioninfo = {};
 		
 		coreversioninfo.label = global.t('ethereum core');
 		coreversioninfo.value = commonmodule.current_version;
 		
 		versioninfos.push(coreversioninfo);
-		
+ */		
 		var dappversioninfo = {};
 		
 		dappversioninfo.label = global.t('ethereum angularjs dapp');
