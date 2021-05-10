@@ -5,12 +5,19 @@
  
  	<div>
   	<span id="web3url-span" class="form-web3url-span">
-		<label for="description">{{'Please enter the url to access web3 provider:' | transl}}</label>
-		<input type="text" class="form-web3url-input" name="web3url" ng-model="web3url.text" required>
+		<label for="web3providerurl">{{'Please enter the url to access web3 provider:' | transl}}</label>
+		<input type="text" class="form-web3url-input" name="web3url" ng-model="web3url.text" ng-change="handleWeb3ProviderUrlChange()" required>
  	</span>
  	</div>
  	
  	<div>
+		<span id="chainid-span" class="form-chainid-span">
+		  <label for="chainid">{{'Please enter the chain id of the web3 provider:' | transl}}</label>
+		  <input type="text" class="form-chainid-input" name="web3url" ng-model="chainid.text" required>
+	   </span>
+	   </div>
+	<div>
+
 	<span id="walletused-span" class="form-walletused-span">
 		<label for="walletused">{{'Default account:' | transl}}</label>
 		<input type="text" class="form-walletused-input"  name="walletused" ng-model="walletused.text" required><br>

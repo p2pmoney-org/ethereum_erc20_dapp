@@ -491,6 +491,8 @@ var DAPPControllers = class {
 
 
 			var web3providerurl = erc20tokencontract.getWeb3ProviderUrl();
+			var chainid = erc20tokencontract.getChainId();
+			var networkid = erc20tokencontract.getNetworkId();
 			
 			$scope.erc20tokenuuid = {
 					text: erc20tokencontract.getUUID()
@@ -529,7 +531,15 @@ var DAPPControllers = class {
 					text: web3providerurl
 			};
 			
+			$scope.chainid = {
+				text: chainid
+			};
 			
+			$scope.networkid = {
+				text: networkid
+			};
+		
+		
 			// chain part
 			
 			// name

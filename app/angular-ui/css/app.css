@@ -154,6 +154,10 @@ header {
   width: 100px;
 }
 
+.form-chainid-input {
+  width: 100px;
+} 
+
 .form-gasprice-input {
   width: 100px;
 } 

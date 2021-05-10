@@ -666,6 +666,7 @@ class Controllers {
 		nodeinfo.web3providerUrl = ethereumnodeaccess.web3_getProviderUrl();
 
 		nodeinfo.islistening = global.t('loading');
+		nodeinfo.chainid = global.t('loading');
 		nodeinfo.networkid = global.t('loading');
 		nodeinfo.peercount = global.t('loading');
 		nodeinfo.issyncing = global.t('loading');
@@ -673,42 +674,12 @@ class Controllers {
 		nodeinfo.highestblock = global.t('loading');
 		
 		var writenodeinfo = function(nodeinfo) {
-			/*ethereumnodeaccess.web3_isListening(function(err, res) {
-				nodeinfo.islistening = res;
-				
-				// tell scope a value has changed
-				$scope.$apply();
-			});
-			
-			ethereumnodeaccess.web3_getNetworkId(function(err, res) {
-				nodeinfo.networkid = res;
-				
-				// tell scope a value has changed
-				$scope.$apply();
-			});
-			
-			ethereumnodeaccess.web3_getPeerCount(function(err, res) {
-				nodeinfo.peercount = res;
-				
-				// tell scope a value has changed
-				$scope.$apply();
-			});
-			
-			ethereumnodeaccess.web3_isSyncing(function(err, res) {
-				if (res !== false)
-					nodeinfo.issyncing = true;
-				else
-					nodeinfo.issyncing = false;
-				
-				// tell scope a value has changed
-				$scope.$apply();
-			});*/
-			
 			ethereumnodeaccess.web3_getNodeInfo(function(err, info) {
 				console.log('returning from web3_getNodeInfo');
 				
 				if (info) {
 					nodeinfo.islistening = info.islistening;
+					nodeinfo.chainid = info.chainid;
 					nodeinfo.networkid = info.networkid;
 					nodeinfo.peercount = info.peercount;
 					nodeinfo.issyncing = info.issyncing;
@@ -717,6 +688,7 @@ class Controllers {
 				}
 				else {
 					nodeinfo.islistening = global.t('not available');
+					nodeinfo.chainid = global.t('not available');
 					nodeinfo.networkid = global.t('not available');
 					nodeinfo.peercount = global.t('not available');
 					nodeinfo.issyncing = global.t('not available');
@@ -724,6 +696,18 @@ class Controllers {
 					nodeinfo.highestblock = global.t('not available');
 				}
 
+				
+				// tell scope a value has changed
+				$scope.$apply();
+			})
+			.catch(function(err) {
+				nodeinfo.islistening = global.t('error');
+				nodeinfo.chainid = global.t('error');
+				nodeinfo.networkid = global.t('error');
+				nodeinfo.peercount = global.t('error');
+				nodeinfo.issyncing = global.t('error');
+				nodeinfo.currentblock = global.t('error');
+				nodeinfo.highestblock = global.t('error');
 				
 				// tell scope a value has changed
 				$scope.$apply();
@@ -1578,6 +1562,9 @@ class Controllers {
 		var ethnodemodule = global.getModuleObject('ethnode');
 		
 		var web3url = ethnodemodule.getWeb3ProviderUrl(session);
+
+		var web3providerobject = ethnodemodule.getWeb3ProviderObject(session, web3url);
+		var chainid = (web3providerobject ? web3providerobject.getVariable('chainid') : null);
 		
 		var accountaddress = ethnodemodule.getWalletAccountAddress(session);
 
@@ -1589,6 +1576,10 @@ class Controllers {
 
 		$scope.web3url = {
 				text: web3url
+		};
+		
+		$scope.chainid = {
+			text: chainid
 		};
 		
 		$scope.walletused = {
@@ -1604,11 +1595,47 @@ class Controllers {
 		};
 		
 		
+		// change function
+		$scope.handleWeb3ProviderUrlChange = function(){
+			self.handleWeb3ProviderUrlChange($scope);
+		}
+
 		// submit function
 		$scope.handleSubmit = function(){
 			self.handleSessionConfigSubmit($scope);
 		}
 		
+	}
+
+	handleWeb3ProviderUrlChange($scope) {
+		console.log("Controllers.handleWeb3ProviderUrlChange called");
+		
+		var global = this.global;
+		var app = this.getAppObject();
+		
+		var commonmodule = global.getModuleObject('common');
+		var session = this.getSessionObject($scope);
+
+		var ethnodemodule = global.getModuleObject('ethnode');
+
+		var web3url = $scope.web3url.text;
+
+		// get chain id to pre-fill the corresponding input
+		var ethereumnodeaccess = ethnodemodule.getEthereumNodeAccessInstance(session, web3url);
+
+		if (ethereumnodeaccess) {
+			ethereumnodeaccess.web3_getChainId(function(err, res) {
+				if (res) {
+					$scope.chainid = {
+						text: res
+					};
+
+					$scope.$apply();
+				}
+
+			});
+		}
+
 	}
 	
 	handleSessionConfigSubmit($scope) {
@@ -1624,12 +1651,18 @@ class Controllers {
 
 		var web3url = $scope.web3url.text;
 		
+		var chainid = parseInt($scope.chainid.text);
+		
 		var accountaddress = $scope.walletused.text;
 		
 		var gaslimit = $scope.gaslimit.text;
 		var gasprice = $scope.gasprice.text;
 		
-		ethnodemodule.setWeb3ProviderUrl(web3url, session);
+		ethnodemodule.setWeb3ProviderUrl(web3url, session, function(err, res) {
+			var web3providerobject = ethnodemodule.getWeb3ProviderObject(session, web3url);
+			web3providerobject.setVariable('chainid', chainid);
+		});
+
 
 		ethnodemodule.setWalletAccountAddress(accountaddress, session);
 		
